@@ -1,0 +1,169 @@
+/* 1. Reset Básico para consistencia entre navegadores */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box; /* Fundamental: el padding y border se quedan dentro del tamaño del elemento */
+}
+
+/* 2. Establecer el Body como Contenedor Flex para el Layout General */
+body {
+    background-color: #f4f7f6; /* Fondo claro */
+    color: #333; /* Texto oscuro */
+    font-family: Arial, sans-serif;
+    
+    /* 🔥 Esta línea es la clave para la distribución vertical 🔥 */
+    display: flex; 
+    flex-direction: column; /* Apila los elementos (header, main, footer) verticalmente */
+    min-height: 100vh; /* Asegura que el cuerpo ocupe al menos el 100% de la altura de la ventana (viewport) */
+}
+
+/* 3. Estilo del Encabezado (HEADER) y uso de Flexbox interno */
+header {
+    background-color: #000000;
+    color: white;
+    padding: 100px 30px;
+    
+    /* 🔥 Flexbox para el Header: distribuye logo y nav a los lados 🔥 */
+    display: flex;
+    justify-content: space-between; /* Empuja los elementos a los extremos */
+    align-items: center; /* Centra verticalmente */
+}
+
+/* Asegura que el header sea el contenedor del video y el texto */
+header {
+    background-color: #000000;
+    padding: 0; /* Quitamos el padding para que el video ocupe el 100% */
+    min-height: 600px; /* Le damos la altura vertical que quieres para el banner */
+    position: relative; /* FUNDAMENTAL: permite posicionar elementos ABSOLUTOS (como el texto) dentro */
+    overflow: hidden; /* Oculta cualquier parte del video que se salga de los límites del header */
+}
+
+/* 1. Estilos para el Video como Fondo */
+.video-contenedor video {
+    /* Estas 5 líneas aseguran que el video cubra completamente el contenedor */
+    position: absolute; 
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    transform: translate(-50%, -50%); /* Centra el video */
+    
+    z-index: 1; /* Lo mantiene como fondo, detrás del contenido */
+    object-fit: cover; /* Asegura que el video cubra el área sin dejar bordes negros */
+}
+
+/* 2. Estilos para el Contenido (Texto) Superpuesto */
+.contenido-superpuesto {
+    position: relative; /* Le da prioridad sobre el video */
+    z-index: 2; /* Lo pone encima del video */
+    text-align: center;
+    color: white; 
+    padding: 100px 20px; /* Ajusta el padding para centrar el texto verticalmente */
+}
+
+
+nav a {
+    color: white;
+    text-decoration: none;
+    margin-left: 20px;
+    transition: color 0.3s; /* Suaviza el cambio de color al pasar el ratón */
+}
+
+nav a:hover {
+    color: #f39c12; /* Cambia a naranja al pasar el ratón */
+}
+
+/* 4. Estilo del Contenido Principal (MAIN) */
+main {
+    /* 🔥 Esta línea hace que el main crezca y ocupe el espacio restante 🔥 */
+    flex-grow: 1; 
+    padding: 40px;
+    text-align: center;
+}
+
+/* 5. Estilo del Pie de Página (FOOTER) */
+footer {
+    background-color: #34495e;
+    color: white;
+    text-align: center;
+    padding: 15px;
+}
+
+/* El signo # selecciona un ID */
+#logo-principal {
+    height: 500px !important; /* El !important fuerza el estilo, aunque es mejor evitarlo */
+    width: 1250px !important;
+}
+
+/* ======================================= */
+/* 1. AJUSTE DEL MAIN (PARA QUE OCUPE EL ESPACIO RESTANTE) */
+/* ======================================= */
+
+/* Asegura que el main sea flexible para que la imagen cubra el resto del espacio */
+main {
+    /* Mantenemos el flex-grow del desafío anterior para que el main se estire */
+    flex-grow: 1; 
+    
+    /* Quitamos el padding para que la imagen toque los bordes */
+    padding: 0; 
+    
+    position: relative; /* Esencial para que el texto (overlay) se posicione sobre la imagen */
+    overflow: hidden; 
+}
+
+
+/* ======================================= */
+/* 2. ESTILO DE LA IMAGEN EN EL MAIN */
+/* ======================================= */
+
+/* Asegura que el contenedor de la imagen ocupe el espacio del main */
+/* ======================================= */
+/* 2. ESTILO DE LA IMAGEN EN EL MAIN */
+/* ======================================= */
+
+.construccion-banner {
+    width: 100%;
+    /* Altura Mínima: Esto hace que el banner ocupe todo el espacio vertical restante */
+    min-height: calc(100vh - 500px); /* ¡Ajusta el 500px a la altura de tu video banner! */
+    
+    position: relative; /* ¡CLAVE! Permite que la imagen y el texto se posicionen absolutamente */
+    overflow: hidden; 
+    
+    /* 🔥 NUEVO: Quitamos el display:flex si lo tenías aquí, o lo ponemos como block si es necesario */
+    display: block; 
+}
+
+/* Estilo para la IMAGEN DENTRO del .construccion-banner */
+.construccion-banner img {
+    /* Estas propiedades son fundamentales para que la imagen cubra todo el espacio */
+    position: absolute; /* Permite posicionarla con top, left, etc. */
+    top: 0;
+    left: 0;
+    width: 100%; /* La imagen siempre al 100% del ancho del padre */
+    height: 100%; /* La imagen siempre al 100% del alto del padre */
+    object-fit: cover; /* CLAVE: Ajusta la imagen para cubrir el espacio sin dejar huecos */
+    object-position: center; /* Centra la imagen si se recorta */
+    z-index: 1; /* Asegura que esté debajo del mensaje */
+}
+
+/* Estilo para el Mensaje Superpuesto (Overlay) */
+.mensaje-overlay {
+    /* Sigue igual, solo asegúrate de que z-index sea más alto que el de la imagen */
+    position: absolute;
+    top: 50%;
+    left: 10%;
+    transform: translate(-50%, -50%); 
+    z-index: 2; /* Para que esté encima de la imagen */
+    
+    color: white; 
+    text-align: center;
+    padding: 30px;
+    background-color: rgba(0, 0, 0, 0.7);
+    border-radius: 10px;
+    max-width: 80%; 
+}
+
+/* También revisa si tienes un body { text-align: center; } o similar que pueda afectar al mensaje */
+body {
+    /* ... Asegúrate de que no haya un text-align: center; aquí si ya lo quitamos del main ... */
+}
