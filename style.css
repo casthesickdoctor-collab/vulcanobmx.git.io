@@ -164,6 +164,43 @@ main {
 }
 
 /* También revisa si tienes un body { text-align: center; } o similar que pueda afectar al mensaje */
-body {
+
     /* ... Asegúrate de que no haya un text-align: center; aquí si ya lo quitamos del main ... */
+}
+
+/* ======================================= */
+/* MEDIA QUERIES: ESTILOS PARA MÓVILES */
+/* ======================================= */
+
+@media (max-width: 600px) {
+    
+    /* 1. Ajuste del Encabezado para Móviles */
+    header {
+        /* Reducimos la altura del encabezado para ahorrar espacio vertical */
+        min-height: 150px; 
+        padding: 10px 10px; /* Reducimos el padding */
+    }
+
+    /* 2. Ajuste del Título del Club (Contenido Superpuesto) */
+    .contenido-superpuesto h1 {
+        font-size: 1.5em; /* Reducimos el tamaño de la fuente para que quepa */
+    }
+    
+    /* 3. Ajuste de la Imagen de Construcción */
+    .construccion-banner {
+        /* Es crucial recalcular la altura para que ocupe el resto del espacio */
+        /* Asegúrate de que el 150px aquí coincida con la nueva altura del header */
+        min-height: calc(100vh - 150px); 
+    }
+
+    /* 4. Ajuste del Mensaje de Construcción */
+    .mensaje-overlay {
+        /* Hacemos el recuadro más pequeño */
+        max-width: 90%; 
+        padding: 20px;
+    }
+    
+    .mensaje-overlay h1 {
+        font-size: 1.8em; /* Reducimos la fuente del mensaje principal */
+    }
 }
