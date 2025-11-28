@@ -1,160 +1,111 @@
-/* 1. Reset Básico para consistencia entre navegadores */
+/* ======================================= */
+/* 1. ESTILOS GENERALES (RESET) */
+/* ======================================= */
 * {
     margin: 0;
     padding: 0;
-    box-sizing: border-box; /* Fundamental: el padding y border se quedan dentro del tamaño del elemento */
+    box-sizing: border-box;
 }
 
-/* 2. Establecer el Body como Contenedor Flex para el Layout General */
 body {
-    background-color: #f4f7f6; /* Fondo claro */
-    color: #333; /* Texto oscuro */
+    background-color: #f4f7f6;
+    color: #333;
     font-family: Arial, sans-serif;
-    
-    /* 🔥 Esta línea es la clave para la distribución vertical 🔥 */
     display: flex; 
-    flex-direction: column; /* Apila los elementos (header, main, footer) verticalmente */
-    min-height: 100vh; /* Asegura que el cuerpo ocupe al menos el 100% de la altura de la ventana (viewport) */
+    flex-direction: column;
+    min-height: 100vh;
 }
 
-/* 3. Estilo del Encabezado (HEADER) y uso de Flexbox interno */
+/* ======================================= */
+/* 2. ESTILOS DE ESCRITORIO (PC/Laptop) */
+/* ======================================= */
+
+/* Header: Contenedor del video superior */
 header {
-    background-color: #000000;
-    color: white;
-    padding: 100px 30px;
-    
-    /* 🔥 Flexbox para el Header: distribuye logo y nav a los lados 🔥 */
-    display: flex;
-    justify-content: space-between; /* Empuja los elementos a los extremos */
-    align-items: center; /* Centra verticalmente */
+    background-color: #000;
+    padding: 0;
+    width: 100%;
+    /* Altura fija para escritorio para efecto "cine" */
+    height: 600px; 
+    position: relative;
+    overflow: hidden;
+    display: block;
 }
 
-/* Asegura que el header sea el contenedor del video y el texto */
-header {
-    background-color: #000000;
-    padding: 0; /* Quitamos el padding para que el video ocupe el 100% */
-    min-height: 600px; /* Le damos la altura vertical que quieres para el banner */
-    position: relative; /* FUNDAMENTAL: permite posicionar elementos ABSOLUTOS (como el texto) dentro */
-    overflow: hidden; /* Oculta cualquier parte del video que se salga de los límites del header */
-}
-
-/* 1. Estilos para el Video como Fondo */
+/* El video de fondo en escritorio (recortado para llenar espacio) */
 .video-contenedor video {
-    /* Estas 5 líneas aseguran que el video cubra completamente el contenedor */
     position: absolute; 
     top: 50%;
     left: 50%;
     min-width: 100%;
     min-height: 100%;
-    transform: translate(-50%, -50%); /* Centra el video */
-    
-    z-index: 1; /* Lo mantiene como fondo, detrás del contenido */
-    object-fit: cover; /* Asegura que el video cubra el área sin dejar bordes negros */
+    transform: translate(-50%, -50%);
+    z-index: 1;
+    object-fit: cover; /* Recorta para llenar */
 }
 
-/* 2. Estilos para el Contenido (Texto) Superpuesto */
+/* Contenido (Texto) encima del video */
 .contenido-superpuesto {
-    position: relative; /* Le da prioridad sobre el video */
-    z-index: 2; /* Lo pone encima del video */
+    position: relative;
+    z-index: 2;
     text-align: center;
     color: white; 
-    padding: 100px 20px; /* Ajusta el padding para centrar el texto verticalmente */
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-
+/* Navegación (si la usas en el futuro) */
 nav a {
     color: white;
     text-decoration: none;
     margin-left: 20px;
-    transition: color 0.3s; /* Suaviza el cambio de color al pasar el ratón */
+    transition: color 0.3s;
 }
 
 nav a:hover {
-    color: #f39c12; /* Cambia a naranja al pasar el ratón */
+    color: #f39c12;
 }
 
-/* 4. Estilo del Contenido Principal (MAIN) */
+/* ======================================= */
+/* 3. MAIN (Sección de Imagen Construcción) */
+/* ======================================= */
+
 main {
-    /* 🔥 Esta línea hace que el main crezca y ocupe el espacio restante 🔥 */
     flex-grow: 1; 
-    padding: 40px;
-    text-align: center;
+    padding: 0;
+    position: relative; 
+    overflow: hidden;
+    width: 100%;
 }
-
-/* 5. Estilo del Pie de Página (FOOTER) */
-footer {
-    background-color: #34495e;
-    color: white;
-    text-align: center;
-    padding: 15px;
-}
-
-/* El signo # selecciona un ID */
-#logo-principal {
-    height: 500px !important; /* El !important fuerza el estilo, aunque es mejor evitarlo */
-    width: 1250px !important;
-}
-
-/* ======================================= */
-/* 1. AJUSTE DEL MAIN (PARA QUE OCUPE EL ESPACIO RESTANTE) */
-/* ======================================= */
-
-/* Asegura que el main sea flexible para que la imagen cubra el resto del espacio */
-main {
-    /* Mantenemos el flex-grow del desafío anterior para que el main se estire */
-    flex-grow: 1; 
-    
-    /* Quitamos el padding para que la imagen toque los bordes */
-    padding: 0; 
-    
-    position: relative; /* Esencial para que el texto (overlay) se posicione sobre la imagen */
-    overflow: hidden; 
-}
-
-
-/* ======================================= */
-/* 2. ESTILO DE LA IMAGEN EN EL MAIN */
-/* ======================================= */
-
-/* Asegura que el contenedor de la imagen ocupe el espacio del main */
-/* ======================================= */
-/* 2. ESTILO DE LA IMAGEN EN EL MAIN */
-/* ======================================= */
 
 .construccion-banner {
     width: 100%;
-    /* Altura Mínima: Esto hace que el banner ocupe todo el espacio vertical restante */
-    min-height: calc(100vh - 500px); /* ¡Ajusta el 500px a la altura de tu video banner! */
-    
-    position: relative; /* ¡CLAVE! Permite que la imagen y el texto se posicionen absolutamente */
-    overflow: hidden; 
-    
-    /* 🔥 NUEVO: Quitamos el display:flex si lo tenías aquí, o lo ponemos como block si es necesario */
+    /* Ocupa el resto de la pantalla en escritorio */
+    min-height: calc(100vh - 600px); 
+    position: relative;
     display: block; 
 }
 
-/* Estilo para la IMAGEN DENTRO del .construccion-banner */
+/* La imagen en escritorio (recortada para llenar) */
 .construccion-banner img {
-    /* Estas propiedades son fundamentales para que la imagen cubra todo el espacio */
-    position: absolute; /* Permite posicionarla con top, left, etc. */
+    position: absolute;
     top: 0;
     left: 0;
-    width: 100%; /* La imagen siempre al 100% del ancho del padre */
-    height: 100%; /* La imagen siempre al 100% del alto del padre */
-    object-fit: cover; /* CLAVE: Ajusta la imagen para cubrir el espacio sin dejar huecos */
-    object-position: center; /* Centra la imagen si se recorta */
-    z-index: 1; /* Asegura que esté debajo del mensaje */
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Recorta para llenar */
+    object-position: center;
+    z-index: 1;
 }
 
-/* Estilo para el Mensaje Superpuesto (Overlay) */
 .mensaje-overlay {
-    /* Sigue igual, solo asegúrate de que z-index sea más alto que el de la imagen */
     position: absolute;
     top: 50%;
-    left: 10%;
+    left: 50%; /* Centrado en escritorio */
     transform: translate(-50%, -50%); 
-    z-index: 2; /* Para que esté encima de la imagen */
-    
+    z-index: 2;
     color: white; 
     text-align: center;
     padding: 30px;
@@ -163,44 +114,63 @@ main {
     max-width: 80%; 
 }
 
-/* También revisa si tienes un body { text-align: center; } o similar que pueda afectar al mensaje */
-
-    /* ... Asegúrate de que no haya un text-align: center; aquí si ya lo quitamos del main ... */
+/* Footer */
+footer {
+    background-color: #34495e;
+    color: white;
+    text-align: center;
+    padding: 15px;
+    z-index: 10;
 }
 
 /* ======================================= */
-/* MEDIA QUERIES: ESTILOS PARA MÓVILES */
+/* 4. VERSIÓN MÓVIL (La Magia) */
 /* ======================================= */
 
-@media (max-width: 600px) {
+@media only screen and (max-width: 768px) {
     
-    /* 1. Ajuste del Encabezado para Móviles */
+    /* A. HEADER EN MÓVIL: Se adapta al tamaño del video */
     header {
-        /* Reducimos la altura del encabezado para ahorrar espacio vertical */
-        min-height: 150px; 
-        padding: 10px 10px; /* Reducimos el padding */
+        height: auto !important;     /* Altura automática */
+        min-height: auto !important; /* Quita mínimos forzados */
+        display: block;
     }
 
-    /* 2. Ajuste del Título del Club (Contenido Superpuesto) */
-    .contenido-superpuesto h1 {
-        font-size: 1.5em; /* Reducimos el tamaño de la fuente para que quepa */
+    /* B. VIDEO EN MÓVIL: Se ve completo (tira horizontal) */
+    .video-contenedor video {
+        position: relative !important; /* Deja de flotar */
+        width: 100% !important;        /* Ancho total */
+        height: auto !important;       /* Altura proporcional */
+        min-height: 0 !important;
+        transform: none !important;    /* Quita el centrado forzado */
+        top: auto !important;
+        left: auto !important;
+        object-fit: contain !important; /* Muestra TODO el video */
+        display: block;
     }
-    
-    /* 3. Ajuste de la Imagen de Construcción */
+
+    /* C. CONTENEDOR DE IMAGEN EN MÓVIL */
     .construccion-banner {
-        /* Es crucial recalcular la altura para que ocupe el resto del espacio */
-        /* Asegúrate de que el 150px aquí coincida con la nueva altura del header */
-        min-height: calc(100vh - 150px); 
+        min-height: auto !important;
+        height: auto !important;
     }
 
-    /* 4. Ajuste del Mensaje de Construcción */
-    .mensaje-overlay {
-        /* Hacemos el recuadro más pequeño */
-        max-width: 90%; 
-        padding: 20px;
+    /* D. IMAGEN EN MÓVIL: Se ve completa */
+    .construccion-banner img {
+        position: relative !important; /* Deja de flotar */
+        width: 100% !important;
+        height: auto !important;
+        object-fit: contain !important; /* Muestra TODA la imagen */
     }
-    
-    .mensaje-overlay h1 {
-        font-size: 1.8em; /* Reducimos la fuente del mensaje principal */
+
+    /* E. AJUSTE DE TEXTOS (Para que no tapen o queden raros) */
+    .contenido-superpuesto, .mensaje-overlay {
+        position: relative !important; /* Ya no flota encima */
+        transform: none !important;
+        top: auto !important;
+        left: auto !important;
+        width: 100%;
+        background: #222; /* Fondo oscuro para que se lea el texto debajo */
+        padding: 20px;
     }
 }
