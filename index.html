@@ -219,6 +219,7 @@
                 <a href="#coach" class="text-gray-200 font-black tracking-widest uppercase text-2xl mobile-link">Coach</a>
                 <a href="#horarios" class="text-gray-200 font-black tracking-widest uppercase text-2xl mobile-link">Horarios</a>
                 <a href="#ubicacion" class="text-gray-200 font-black tracking-widest uppercase text-2xl mobile-link">Ubicaciones</a>
+                <!-- Únete en móvil -->
                 <a href="#contacto" class="text-orange-500 font-black tracking-widest uppercase text-2xl mobile-link">Únete ahora</a>
                 <button onclick="window.toggleModal('loginModal')" class="text-gray-200 font-black tracking-widest uppercase text-2xl mobile-link">Portal Miembros</button>
             </div>
@@ -545,13 +546,13 @@
                         <input type="text" id="newsTitle" placeholder="Título de la publicación" required class="w-full bg-[#252525] border border-white/5 px-6 py-4 rounded-xl text-white outline-none focus:ring-2 focus:ring-purple-500 transition">
                         <textarea id="newsContent" placeholder="Describe lo que pasó..." rows="3" required class="w-full bg-[#252525] border border-white/5 px-6 py-4 rounded-xl text-white outline-none focus:ring-2 focus:ring-purple-500 transition"></textarea>
                         
-                        <!-- Archivos subidos a GitHub o YouTube -->
+                        <!-- Uso de Links Gratuitos (GitHub/YouTube) -->
                         <div class="bg-black/30 p-4 rounded-xl border border-white/5">
-                            <label class="block text-[10px] font-black text-purple-500 uppercase tracking-widest mb-3">Nombre del archivo (ej: foto.jpg) o Link YouTube</label>
-                            <input type="text" id="newsMediaUrl" placeholder="ej: foto.jpg o https://youtube.com/watch..." class="w-full bg-[#252525] border border-white/5 px-4 py-3 rounded-lg text-white text-sm outline-none">
+                            <label class="block text-[10px] font-black text-purple-500 uppercase tracking-widest mb-3">Nombre del archivo en GitHub (ej: foto.jpg) o Link YouTube</label>
+                            <input type="text" id="newsMediaUrl" placeholder="Ej: mifoto.jpg o https://youtube.com/watch..." class="w-full bg-[#252525] border border-white/5 px-4 py-3 rounded-lg text-white text-sm outline-none focus:border-purple-500 transition">
                         </div>
 
-                        <select id="newsMediaType" class="w-full bg-[#252525] border border-white/5 px-6 py-4 rounded-xl text-gray-400">
+                        <select id="newsMediaType" class="w-full bg-[#252525] border border-white/5 px-6 py-4 rounded-xl text-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500">
                             <option value="image">Tipo: Imagen (en mi GitHub)</option>
                             <option value="video">Tipo: Video YouTube (Link)</option>
                             <option value="text">Tipo: Solo Texto</option>
@@ -587,29 +588,29 @@
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Configuración Fija de Firebase 
-        let firebaseConfig = {
-            apiKey: "AIzaSyD2lj5XsTghDKNxa_RE-hk1sA8V174lk_E", 
-            authDomain: "vulcanobmx.firebaseapp.com",
-            projectId: "vulcanobmx",
-            storageBucket: "vulcanobmx.firebasestorage.app",
-            messagingSenderId: "196835151646",
-            appId: "1:196835151646:web:8962502338d42dc817830f"
-        };
+        // Variables de configuración de Firebase
+        let firebaseConfig;
+        let appIdValue;
 
-        // Lógica de entorno seguro (solo la sobreescribe si el entorno de pruebas envía una llave válida)
+        // Detección estricta del entorno para aislar tu GitHub del entorno de pruebas
         if (typeof __firebase_config !== 'undefined') {
-            try {
-                const envConfig = JSON.parse(__firebase_config);
-                if (envConfig && envConfig.apiKey && envConfig.apiKey.length > 0) {
-                    firebaseConfig = envConfig;
-                }
-            } catch (e) {
-                console.warn("Usando configuración local en lugar de la del entorno de pruebas.");
-            }
+            // Entorno de pruebas (Canvas)
+            firebaseConfig = JSON.parse(__firebase_config);
+            appIdValue = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        } else {
+            // Tu entorno real y tu GitHub (Usa tus llaves exactas)
+            firebaseConfig = {
+                apiKey: "AIzaSyD2lj5XsTghDKNxa_RE-hk1sA8V174lk_E", 
+                authDomain: "vulcanobmx.firebaseapp.com",
+                projectId: "vulcanobmx",
+                storageBucket: "vulcanobmx.firebasestorage.app",
+                messagingSenderId: "196835151646",
+                appId: "1:196835151646:web:8962502338d42dc817830f",
+                measurementId: "G-LQRF132K8V"
+            };
+            appIdValue = 'vulcanobmx';
         }
 
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'vulcanobmx';
         let auth, db, currentUser = null;
 
         // --- FUNCIONES GLOBALES PARA EL HTML ---
@@ -636,7 +637,6 @@
                 auth = getAuth(app);
                 db = getFirestore(app);
 
-                // Inicio de sesión anónimo obligatorio para escribir en Firestore
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
                 } else {
@@ -654,7 +654,7 @@
                 console.error("Error conectando con Firebase:", err);
                 const newsContainer = document.getElementById('news-container');
                 if (newsContainer) {
-                    newsContainer.innerHTML = '<div class="col-span-full text-center text-gray-600 py-10 italic">No se pudo conectar a la base de datos. Asegúrate de tener conexión.</div>';
+                    newsContainer.innerHTML = '<div class="col-span-full text-center text-red-500 py-10 italic font-bold">Error de conexión: Revisa tu internet o la configuración de Firebase.</div>';
                 }
             }
         };
@@ -662,7 +662,7 @@
         // --- CARGA DE NOTICIAS ---
         const loadNews = () => {
             if (!db || !currentUser) return;
-            const q = collection(db, 'artifacts', appId, 'public', 'data', 'news');
+            const q = collection(db, 'artifacts', appIdValue, 'public', 'data', 'news');
             
             onSnapshot(q, (snap) => {
                 const container = document.getElementById('news-container');
@@ -711,7 +711,7 @@
         // --- CARGAR PERFIL DE DEPORTISTA ---
         const setupProfile = async (uid) => {
             if (!uid || !db || !currentUser) return;
-            const userDocRef = doc(db, 'artifacts', appId, 'users', uid, 'profile', 'data');
+            const userDocRef = doc(db, 'artifacts', appIdValue, 'users', uid, 'profile', 'data');
             
             try {
                 const snap = await getDoc(userDocRef);
@@ -750,7 +750,7 @@
                 const adminBtn = document.getElementById('admin-tab-btn');
                 if(adminBtn) adminBtn.classList.remove('hidden');
                 
-                onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'leads'), (snap) => {
+                onSnapshot(collection(db, 'artifacts', appIdValue, 'public', 'data', 'leads'), (snap) => {
                     const list = document.getElementById('leads-list');
                     if (!list) return;
                     list.innerHTML = '';
@@ -770,7 +770,7 @@
                                 <span class="bg-purple-600/20 text-purple-400 px-2 py-0.5 rounded text-[8px] font-black">${d.level || '-'}</span>
                             </div>
                             <div class="text-white text-sm font-bold"><i class="fab fa-whatsapp mr-2 text-green-500"></i>${d.phone || 'Sin teléfono'}</div>
-                            <div class="text-gray-500 text-[10px] mt-2 italic border-t border-white/5 pt-2">${d.notes || 'Sin notas.'}</div>
+                            <div class="text-gray-500 text-[10px] mt-2 italic border-t border-white/5 pt-2">${d.notes || 'Sin preguntas adicionales.'}</div>
                         `;
                         list.appendChild(item);
                     });
@@ -809,7 +809,7 @@
                 const attemptSend = async () => {
                     if (db && currentUser) {
                         try {
-                            const leadsRef = collection(db, 'artifacts', appId, 'public', 'data', 'leads');
+                            const leadsRef = collection(db, 'artifacts', appIdValue, 'public', 'data', 'leads');
                             await addDoc(leadsRef, {
                                 name: document.getElementById('leadName').value,
                                 phone: document.getElementById('leadPhone').value,
@@ -823,7 +823,7 @@
                             console.error("Error al enviar.", err);
                             btnText.innerHTML = originalText;
                             document.getElementById('submitLeadBtn').disabled = false;
-                            alert("Hubo un error de conexión con la base de datos.");
+                            alert("Hubo un error de conexión. Asegúrate de tener Internet y de haber pegado tus llaves correctamente en el código.");
                         }
                     } else if (retries < 5) {
                         retries++;
@@ -831,7 +831,7 @@
                     } else {
                         btnText.innerHTML = originalText;
                         document.getElementById('submitLeadBtn').disabled = false;
-                        alert("No se pudo establecer conexión con Firebase. Asegúrate de tener conexión a Internet.");
+                        alert("No se pudo conectar a tu base de datos de Firebase. Revisa la consola y las reglas de seguridad.");
                     }
                 };
                 
@@ -876,7 +876,7 @@
 
                 try {
                     if (db && currentUser) {
-                        await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'news'), {
+                        await addDoc(collection(db, 'artifacts', appIdValue, 'public', 'data', 'news'), {
                             title: title,
                             content: content,
                             mediaUrl: mediaUrl,
@@ -885,7 +885,7 @@
                         });
                         
                         e.target.reset();
-                        alert("¡Muro actualizado con éxito! Revisa la página principal.");
+                        alert("¡Noticia publicada con éxito! Revisa la página principal.");
                     } else {
                         alert("Error de conexión. Intenta de nuevo en unos segundos.");
                     }
