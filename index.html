@@ -178,7 +178,7 @@
 <body class="overflow-x-hidden">
 
     <!-- WhatsApp Flotante -->
-    <a href="https://wa.me/573174321771" target="_blank" class="whatsapp-float">
+    <a href="https://wa.me/573127814421" target="_blank" class="whatsapp-float">
         <i class="fab fa-whatsapp"></i>
     </a>
 
@@ -238,6 +238,7 @@
             </div>
             <form id="portalLoginForm" class="space-y-4">
                 <input type="text" id="loginId" placeholder="ID Piloto (Coach usa: COACH)" required class="w-full bg-zinc-800 border border-white/5 px-6 py-4 rounded-xl text-white outline-none focus:border-orange-500 transition">
+                <!-- Se requiere contraseña para Pilotos -->
                 <input type="password" id="loginPass" placeholder="Contraseña" required class="w-full bg-zinc-800 border border-white/5 px-6 py-4 rounded-xl text-white outline-none focus:border-orange-500 transition">
                 <button type="submit" class="w-full btn-gradient py-4 rounded-xl font-black text-lg italic uppercase shadow-xl text-white"><span>Ingresar</span></button>
             </form>
@@ -537,13 +538,13 @@
                         </div>
                     </div>
 
-                    <!-- NUEVO: Contenedor Principal de Video Base (Video Destacado general) -->
+                    <!-- Contenedor Principal de Video Base (Video Destacado general) -->
                     <div id="profileVideoContainer" class="hidden bg-zinc-900 p-10 rounded-[3rem] border border-white/5 shadow-2xl">
                         <h3 class="font-heading text-xl font-black italic text-gradient uppercase mb-6 tracking-widest border-b border-white/5 pb-4">Video Destacado del Piloto</h3>
                         <iframe id="profileVideoIframe" class="w-full aspect-video rounded-2xl shadow-lg border border-white/10" src="" frameborder="0" allowfullscreen></iframe>
                     </div>
 
-                    <!-- NUEVO: SECCIÓN REPORTE DEL COACH (Evolución y Notas) -->
+                    <!-- SECCIÓN REPORTE DEL COACH (Evolución y Notas) -->
                     <div id="profileCoachReportContainer" class="hidden bg-zinc-900 p-10 rounded-[3rem] border border-white/5 shadow-2xl mt-8">
                         <h3 class="font-heading text-xl font-black text-orange-500 uppercase italic mb-6 tracking-widest border-b border-white/5 pb-4">
                             <i class="fas fa-clipboard-check mr-2"></i> Reporte Técnico del Coach
@@ -564,24 +565,35 @@
             <!-- Pestaña 2: Administración -->
             <div id="tab-admin" class="hidden text-left space-y-8">
                 
-                <!-- GESTOR DE PILOTOS (AHORA CON MENSUALIDAD, COMPETENCIA Y REPORTE DEL COACH) -->
+                <!-- GESTOR DE PILOTOS (AHORA CON BÚSQUEDA Y CONTRASEÑAS) -->
                 <div class="bg-zinc-900 p-8 rounded-[3rem] border border-orange-500/20 shadow-2xl w-full">
                     <h3 class="font-heading text-2xl font-black text-orange-500 uppercase italic mb-2 tracking-widest">Gestor Maestro de Pilotos</h3>
-                    <p class="text-gray-400 text-sm mb-8 italic border-b border-white/5 pb-4">Crea nuevos pilotos o actualiza los datos, estado y reportes técnicos de los existentes.</p>
+                    <p class="text-gray-400 text-sm mb-8 italic border-b border-white/5 pb-4">Crea nuevos pilotos o busca uno existente para actualizar sus datos y asignar su contraseña de ingreso.</p>
                     
                     <form id="pilotForm" class="space-y-6">
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            <!-- Datos Básicos -->
-                            <div class="lg:col-span-3 border-b border-white/5 pb-4 mb-2"><h4 class="text-white font-bold uppercase text-xs tracking-widest">1. Datos Básicos</h4></div>
+                            
+                            <!-- 1. Datos Básicos -->
+                            <div class="lg:col-span-3 border-b border-white/5 pb-4 mb-2"><h4 class="text-white font-bold uppercase text-xs tracking-widest">1. Datos Básicos y Acceso</h4></div>
 
-                            <div>
-                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">ID Único del Piloto *</label>
-                                <input type="text" id="pilotIdInput" placeholder="Ej: MATEO01" required class="w-full bg-[#252525] border border-white/5 px-4 py-3 rounded-xl text-white outline-none focus:ring-2 focus:ring-orange-500 transition">
+                            <div class="lg:col-span-1 md:col-span-1 flex items-end gap-2">
+                                <div class="flex-grow">
+                                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">ID Único del Piloto *</label>
+                                    <input type="text" id="pilotIdInput" placeholder="Ej: MATEO01" required class="w-full bg-[#252525] border border-white/5 px-4 py-3 rounded-xl text-white outline-none focus:ring-2 focus:ring-orange-500 transition">
+                                </div>
+                                <button type="button" id="searchPilotBtn" class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-3 rounded-xl transition shadow-lg h-[50px]" title="Buscar datos guardados del piloto">
+                                    <i class="fas fa-search"></i> Buscar
+                                </button>
                             </div>
-                            <div>
+                            <div class="lg:col-span-1 md:col-span-1">
+                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Contraseña de Acceso *</label>
+                                <input type="text" id="pilotPassword" placeholder="Ej: 1234" required class="w-full bg-[#252525] border border-white/5 px-4 py-3 rounded-xl text-white outline-none focus:ring-2 focus:ring-orange-500 transition">
+                            </div>
+                            <div class="lg:col-span-1 md:col-span-2">
                                 <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Nombre Completo *</label>
                                 <input type="text" id="pilotName" placeholder="Ej: Mateo Rodríguez" required class="w-full bg-[#252525] border border-white/5 px-4 py-3 rounded-xl text-white outline-none focus:ring-2 focus:ring-orange-500 transition">
                             </div>
+                            
                             <div>
                                 <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Categoría *</label>
                                 <input type="text" id="pilotLevel" placeholder="Ej: Iniciación, Élite..." required class="w-full bg-[#252525] border border-white/5 px-4 py-3 rounded-xl text-white outline-none focus:ring-2 focus:ring-orange-500 transition">
@@ -598,12 +610,12 @@
                                 <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Tipo de Sangre</label>
                                 <input type="text" id="pilotBlood" placeholder="Ej: O+" class="w-full bg-[#252525] border border-white/5 px-4 py-3 rounded-xl text-white outline-none focus:ring-2 focus:ring-orange-500 transition">
                             </div>
-                            <div class="lg:col-span-3">
+                            <div class="lg:col-span-2">
                                 <label class="block text-[10px] font-black text-orange-500 uppercase tracking-widest mb-2">Link Foto de Perfil Principal (En tu GitHub)</label>
                                 <input type="text" id="pilotPhoto" placeholder="Ej: mateo-perfil.jpg" class="w-full bg-[#252525] border border-white/5 px-4 py-3 rounded-xl text-white outline-none focus:ring-2 focus:ring-orange-500 transition">
                             </div>
 
-                            <!-- Estado y Competencias -->
+                            <!-- 2. Estado y Competencias -->
                             <div class="lg:col-span-3 border-b border-white/5 pb-4 mt-4 mb-2"><h4 class="text-white font-bold uppercase text-xs tracking-widest">2. Estado y Competencias</h4></div>
                             
                             <div>
@@ -622,7 +634,7 @@
                                 <input type="text" id="pilotRaceLoc" placeholder="Ej: Pasto, Nariño" class="w-full bg-[#252525] border border-white/5 px-4 py-3 rounded-xl text-white outline-none focus:ring-2 focus:ring-orange-500 transition">
                             </div>
 
-                            <!-- Reporte Técnico del Entrenador -->
+                            <!-- 3. Reporte Técnico del Entrenador -->
                             <div class="lg:col-span-3 border-b border-white/5 pb-4 mt-4 mb-2"><h4 class="text-purple-500 font-bold uppercase text-xs tracking-widest">3. Reporte Técnico / Evolución</h4></div>
                             
                             <div class="lg:col-span-3">
@@ -877,23 +889,16 @@
                 const raceLocEl = document.getElementById('profileNextRaceLocation');
                 if (raceLocEl) raceLocEl.innerText = data.nextRaceLocation || "--";
 
-                // Cargar Video Destacado del Perfil (Si existe)
-                /* Ojo: Lo dejamos oculto si no hay, o lo mostramos */
-                /* No confundir con el Video del Reporte del Coach */
-                /* En esta versión, vamos a usar el reporte del coach como área principal de multimedia */
-
-                // 🔴 NUEVO: Cargar Reporte Técnico del Coach
+                // Cargar Reporte Técnico del Coach
                 const reportContainer = document.getElementById('profileCoachReportContainer');
                 const notesEl = document.getElementById('profileCoachNotes');
                 const reportImg = document.getElementById('profileReportImage');
                 const reportVid = document.getElementById('profileReportVideo');
 
-                // ¿Tiene reporte? (Si hay notas, foto o video)
                 if ((data.coachNotes && data.coachNotes.trim() !== "") || (data.reportPhoto && data.reportPhoto.trim() !== "") || (data.reportVideo && data.reportVideo.trim() !== "")) {
                     if(reportContainer) reportContainer.classList.remove('hidden');
                     if(notesEl) notesEl.innerText = data.coachNotes || "";
                     
-                    // Foto del reporte
                     if (data.reportPhoto && data.reportPhoto.trim() !== "") {
                         reportImg.src = data.reportPhoto;
                         reportImg.classList.remove('hidden');
@@ -901,7 +906,6 @@
                         reportImg.classList.add('hidden');
                     }
 
-                    // Video del reporte
                     if (data.reportVideo && data.reportVideo.trim() !== "") {
                         let embedUrl = data.reportVideo;
                         if (embedUrl.includes('watch?v=')) embedUrl = embedUrl.replace('watch?v=', 'embed/').split('&')[0];
@@ -912,7 +916,6 @@
                         reportVid.classList.add('hidden');
                     }
                 } else {
-                    // Si no hay reporte, ocultamos toda la sección
                     if(reportContainer) reportContainer.classList.add('hidden');
                 }
 
@@ -1003,38 +1006,41 @@
                 }
             });
 
-            // LÓGICA DE LOGIN ESTRICTA (SEPARACIÓN DE COACH Y PILOTO)
+            // 🔴 LÓGICA DE LOGIN ESTRICTA CON CONTRASEÑA 🔴
             const loginForm = document.getElementById('portalLoginForm');
             if (loginForm) {
-                loginForm.addEventListener('submit', (e) => {
+                loginForm.addEventListener('submit', async (e) => {
                     e.preventDefault();
                     
                     const loginIdInput = document.getElementById('loginId');
-                    if (!loginIdInput) return;
+                    const loginPassInput = document.getElementById('loginPass');
+                    if (!loginIdInput || !loginPassInput) return;
                     
                     const loginId = loginIdInput.value.trim().toUpperCase();
+                    const loginPass = loginPassInput.value;
                     if (!loginId) return;
 
-                    window.currentLoginId = loginId;
-                    
-                    // Transición visual principal
-                    window.toggleModal('loginModal');
-                    document.getElementById('public-site').classList.add('hidden');
-                    document.getElementById('main-nav').classList.add('hidden');
-                    document.getElementById('member-portal').classList.remove('hidden');
-                    window.scrollTo(0, 0);
+                    const submitBtn = loginForm.querySelector('button[type="submit"]');
+                    const originalBtnHtml = submitBtn.innerHTML;
+                    submitBtn.innerHTML = '<span><div class="loader"></div> VERIFICANDO...</span>';
+                    submitBtn.disabled = true;
 
-                    // CANDADO DE SEGURIDAD ESTRICTO: Por defecto todo lo de Coach se oculta
-                    const adminTabBtn = document.getElementById('admin-tab-btn');
-                    if(adminTabBtn) adminTabBtn.style.display = 'none'; // Se oculta forzadamente
-                    document.getElementById('tab-admin').classList.add('hidden');
-                    document.getElementById('tab-profile').classList.remove('hidden');
-                    document.getElementById('btn-profile').className = 'px-6 py-2 bg-orange-500 rounded-full text-xs font-black uppercase text-white transition shadow-lg';
-
-                    // Si entra el Coach, se desbloquean sus herramientas
+                    // Si entra el Coach
                     if (loginId === 'COACH' || loginId === 'ADMIN') {
-                        if(adminTabBtn) adminTabBtn.style.display = 'inline-block'; // Se revela solo a él
+                        window.currentLoginId = loginId;
                         
+                        window.toggleModal('loginModal');
+                        document.getElementById('public-site').classList.add('hidden');
+                        document.getElementById('main-nav').classList.add('hidden');
+                        document.getElementById('member-portal').classList.remove('hidden');
+                        window.scrollTo(0, 0);
+
+                        const adminTabBtn = document.getElementById('admin-tab-btn');
+                        if(adminTabBtn) adminTabBtn.style.display = 'inline-block'; 
+                        document.getElementById('tab-admin').classList.add('hidden');
+                        document.getElementById('tab-profile').classList.remove('hidden');
+                        document.getElementById('btn-profile').className = 'px-6 py-2 bg-orange-500 rounded-full text-xs font-black uppercase text-white transition shadow-lg';
+
                         document.getElementById('profileName').innerText = "Coach Vulcano";
                         document.getElementById('profileIdDisplay').innerText = "COACH";
                         document.getElementById('profileLevel').innerText = "Categoría: STAFF";
@@ -1047,19 +1053,59 @@
                         const img = document.getElementById('profilePhotoImg');
                         if (img) img.classList.add('hidden');
                         
-                        // Ocultamos reportes en la vista del coach (porque él es coach)
                         const vc = document.getElementById('profileVideoContainer');
                         if (vc) vc.classList.add('hidden');
                         const rc = document.getElementById('profileCoachReportContainer');
                         if (rc) rc.classList.add('hidden');
 
-                        // Activar y saltar directo al Panel Coach
                         checkAdmin();
                         window.switchTab('admin');
                     } else {
-                        // Si entra un Piloto normal, el Panel de Coach se queda oculto
-                        setupProfile(loginId);
+                        // 🔴 NUEVA VALIDACIÓN: Si entra un Piloto, comprobamos si existe y si su clave es correcta
+                        if (db) {
+                            try {
+                                const userDocRef = doc(db, 'artifacts', currentAppId, 'public', 'data', 'profiles', loginId);
+                                const snap = await getDoc(userDocRef);
+                                
+                                if (snap.exists()) {
+                                    const data = snap.data();
+                                    const storedPass = data.password || ""; 
+                                    
+                                    // Si el Coach le asignó contraseña, verificamos que coincida
+                                    if (storedPass !== "" && loginPass !== storedPass) {
+                                        alert("Contraseña incorrecta. Intenta de nuevo.");
+                                        submitBtn.innerHTML = originalBtnHtml;
+                                        submitBtn.disabled = false;
+                                        return;
+                                    }
+                                    
+                                    // Si la clave es correcta o el coach no le ha puesto clave aún, lo deja entrar
+                                    window.currentLoginId = loginId;
+                                    window.toggleModal('loginModal');
+                                    document.getElementById('public-site').classList.add('hidden');
+                                    document.getElementById('main-nav').classList.add('hidden');
+                                    document.getElementById('member-portal').classList.remove('hidden');
+                                    window.scrollTo(0, 0);
+
+                                    const adminTabBtn = document.getElementById('admin-tab-btn');
+                                    if(adminTabBtn) adminTabBtn.style.display = 'none';
+                                    document.getElementById('tab-admin').classList.add('hidden');
+                                    document.getElementById('tab-profile').classList.remove('hidden');
+                                    document.getElementById('btn-profile').className = 'px-6 py-2 bg-orange-500 rounded-full text-xs font-black uppercase text-white transition shadow-lg';
+
+                                    setupProfile(loginId);
+                                } else {
+                                    alert("El Piloto '" + loginId + "' no existe. Pide a tu Coach que cree tu perfil primero.");
+                                }
+                            } catch (err) {
+                                console.error(err);
+                                alert("Error al verificar datos. Revisa tu conexión.");
+                            }
+                        }
                     }
+                    
+                    submitBtn.innerHTML = originalBtnHtml;
+                    submitBtn.disabled = false;
                 });
             }
 
@@ -1099,7 +1145,59 @@
                 }
             });
 
-            // 🔴 FORMULARIO GESTOR DE PILOTOS (Guarda todos los datos nuevos)
+            // 🔴 NUEVA FUNCIÓN: Botón para Buscar Piloto Existente en el Gestor
+            const searchPilotBtn = document.getElementById('searchPilotBtn');
+            searchPilotBtn?.addEventListener('click', async () => {
+                const pidInput = document.getElementById('pilotIdInput');
+                const pid = pidInput.value.trim().toUpperCase();
+                
+                if (!pid) {
+                    alert("Por favor, escribe un ID de Piloto en la casilla primero.");
+                    return;
+                }
+                
+                if (db) {
+                    const originalHtml = searchPilotBtn.innerHTML;
+                    searchPilotBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                    
+                    try {
+                        const profileRef = doc(db, 'artifacts', currentAppId, 'public', 'data', 'profiles', pid);
+                        const snap = await getDoc(profileRef);
+                        
+                        if (snap.exists()) {
+                            const data = snap.data();
+                            // Rellenar todos los campos con los datos guardados
+                            document.getElementById('pilotName').value = data.name || '';
+                            document.getElementById('pilotPassword').value = data.password || '';
+                            document.getElementById('pilotLevel').value = data.level || '';
+                            document.getElementById('pilotPoints').value = data.points || 0;
+                            document.getElementById('pilotAge').value = data.age || '';
+                            document.getElementById('pilotBlood').value = data.blood || '';
+                            document.getElementById('pilotPhoto').value = data.photoUrl || '';
+                            document.getElementById('pilotPayment').value = data.paymentStatus || 'Al día';
+                            document.getElementById('pilotRace').value = data.nextRace || '';
+                            document.getElementById('pilotRaceLoc').value = data.nextRaceLocation || '';
+                            document.getElementById('pilotNotes').value = data.coachNotes || '';
+                            document.getElementById('pilotReportImage').value = data.reportPhoto || '';
+                            document.getElementById('pilotReportVideo').value = data.reportVideo || '';
+                            
+                            alert("¡Perfil encontrado! Los datos han sido cargados. Puedes modificarlos y luego hacer clic en Guardar Cambios.");
+                        } else {
+                            // Limpiamos los campos (menos el ID) para que cree uno nuevo
+                            document.getElementById('pilotForm').reset();
+                            pidInput.value = pid; 
+                            alert("No hay ningún piloto registrado con el ID '" + pid + "'. Puedes llenar los datos y guardarlo como nuevo.");
+                        }
+                    } catch(e) {
+                        console.error("Error buscando:", e);
+                        alert("Hubo un error al buscar al piloto.");
+                    }
+                    
+                    searchPilotBtn.innerHTML = originalHtml;
+                }
+            });
+
+            // 🔴 FORMULARIO GESTOR DE PILOTOS (Guarda o Sobreescribe)
             const pilotForm = document.getElementById('pilotForm');
             pilotForm?.addEventListener('submit', async (e) => {
                 e.preventDefault();
@@ -1114,8 +1212,9 @@
                     try {
                         const profileRef = doc(db, 'artifacts', currentAppId, 'public', 'data', 'profiles', pid);
                         await setDoc(profileRef, {
-                            // Basicos
+                            // Basicos y Acceso
                             name: document.getElementById('pilotName').value.trim(),
+                            password: document.getElementById('pilotPassword').value.trim(), // <--- Nueva Contraseña
                             level: document.getElementById('pilotLevel').value.trim(),
                             points: Number(document.getElementById('pilotPoints').value) || 0,
                             age: document.getElementById('pilotAge').value.trim(),
@@ -1131,9 +1230,9 @@
                             reportVideo: document.getElementById('pilotReportVideo').value.trim(),
                             
                             updatedAt: new Date().toISOString()
-                        }, { merge: true }); // merge: true evita borrar datos
+                        }, { merge: true }); // merge: true evita borrar datos antiguos
                         
-                        alert("¡Piloto " + pid + " guardado exitosamente en la base de datos!");
+                        alert("¡Éxito! Piloto " + pid + " guardado en la base de datos de Firebase.");
                         pilotForm.reset();
                     } catch (err) {
                         console.error(err);
