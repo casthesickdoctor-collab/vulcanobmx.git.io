@@ -546,7 +546,7 @@
                         <input type="text" id="newsTitle" placeholder="Título de la publicación" required class="w-full bg-[#252525] border border-white/5 px-6 py-4 rounded-xl text-white outline-none focus:ring-2 focus:ring-purple-500 transition">
                         <textarea id="newsContent" placeholder="Describe lo que pasó..." rows="3" required class="w-full bg-[#252525] border border-white/5 px-6 py-4 rounded-xl text-white outline-none focus:ring-2 focus:ring-purple-500 transition"></textarea>
                         
-                        <!-- Uso de Links Gratuitos (GitHub/YouTube) -->
+                        <!-- Archivos subidos a GitHub o YouTube -->
                         <div class="bg-black/30 p-4 rounded-xl border border-white/5">
                             <label class="block text-[10px] font-black text-purple-500 uppercase tracking-widest mb-3">Nombre del archivo en GitHub (ej: foto.jpg) o Link YouTube</label>
                             <input type="text" id="newsMediaUrl" placeholder="Ej: mifoto.jpg o https://youtube.com/watch..." class="w-full bg-[#252525] border border-white/5 px-4 py-3 rounded-lg text-white text-sm outline-none focus:border-purple-500 transition">
@@ -594,11 +594,12 @@
 
         // Detección estricta del entorno para aislar tu GitHub del entorno de pruebas
         if (typeof __firebase_config !== 'undefined') {
-            // Entorno de pruebas (Canvas)
+            // Entorno de pruebas (Canvas): Usa credenciales internas temporales
             firebaseConfig = JSON.parse(__firebase_config);
             appIdValue = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         } else {
             // Tu entorno real y tu GitHub (Usa tus llaves exactas)
+            // ⚠️ IMPORTANTE: Si al subir a GitHub falla, asegúrate de que la apiKey sea 100% igual a la de tu consola Firebase.
             firebaseConfig = {
                 apiKey: "AIzaSyD2lj5XsTghDKNxa_RE-hk1sA8V174lk_E", 
                 authDomain: "vulcanobmx.firebaseapp.com",
@@ -637,7 +638,8 @@
                 auth = getAuth(app);
                 db = getFirestore(app);
 
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                // Inicio de sesión dual: Si estás en Canvas usa el token, si es local usa anónimo.
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token && firebaseConfig.projectId !== "vulcanobmx") {
                     await signInWithCustomToken(auth, __initial_auth_token);
                 } else {
                     await signInAnonymously(auth);
@@ -654,7 +656,7 @@
                 console.error("Error conectando con Firebase:", err);
                 const newsContainer = document.getElementById('news-container');
                 if (newsContainer) {
-                    newsContainer.innerHTML = '<div class="col-span-full text-center text-red-500 py-10 italic font-bold">Error de conexión: Revisa tu internet o la configuración de Firebase.</div>';
+                    newsContainer.innerHTML = '<div class="col-span-full text-center text-red-500 py-10 italic font-bold">Error de conexión con la pista. Verifica tu internet o tus reglas en Firebase.</div>';
                 }
             }
         };
@@ -774,6 +776,8 @@
                         `;
                         list.appendChild(item);
                     });
+                }, (error) => {
+                    console.error("Error al descargar leads:", error);
                 });
             }
         };
@@ -823,7 +827,7 @@
                             console.error("Error al enviar.", err);
                             btnText.innerHTML = originalText;
                             document.getElementById('submitLeadBtn').disabled = false;
-                            alert("Hubo un error de conexión. Asegúrate de tener Internet y de haber pegado tus llaves correctamente en el código.");
+                            alert("Hubo un error de conexión con la base de datos.");
                         }
                     } else if (retries < 5) {
                         retries++;
@@ -831,7 +835,7 @@
                     } else {
                         btnText.innerHTML = originalText;
                         document.getElementById('submitLeadBtn').disabled = false;
-                        alert("No se pudo conectar a tu base de datos de Firebase. Revisa la consola y las reglas de seguridad.");
+                        alert("No se pudo conectar a Firebase. Revisa tu consola si el error persiste.");
                     }
                 };
                 
@@ -885,7 +889,7 @@
                         });
                         
                         e.target.reset();
-                        alert("¡Noticia publicada con éxito! Revisa la página principal.");
+                        alert("¡Muro actualizado con éxito! Revisa la página principal.");
                     } else {
                         alert("Error de conexión. Intenta de nuevo en unos segundos.");
                     }
