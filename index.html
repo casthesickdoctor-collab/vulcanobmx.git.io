@@ -237,7 +237,7 @@
                 <h3 class="font-heading text-2xl font-bold italic uppercase text-gradient">Portal de Pilotos</h3>
             </div>
             <form id="portalLoginForm" class="space-y-4">
-                <!-- Se agregó el ID correctamente para que el sistema reconozca quién entra -->
+                <!-- ID Piloto Reconocido -->
                 <input type="text" id="loginId" placeholder="ID Piloto (Coach usa: COACH)" required class="w-full bg-zinc-800 border border-white/5 px-6 py-4 rounded-xl text-white outline-none focus:border-orange-500 transition">
                 <input type="password" id="loginPass" placeholder="Contraseña" required class="w-full bg-zinc-800 border border-white/5 px-6 py-4 rounded-xl text-white outline-none focus:border-orange-500 transition">
                 <button type="submit" class="w-full btn-gradient py-4 rounded-xl font-black text-lg italic uppercase shadow-xl text-white"><span>Ingresar</span></button>
@@ -555,6 +555,7 @@
                             <input type="text" id="newsTitle" placeholder="Título de la publicación" required class="w-full bg-[#252525] border border-white/5 px-6 py-4 rounded-xl text-white outline-none focus:ring-2 focus:ring-purple-500 transition">
                             <textarea id="newsContent" placeholder="Describe lo que pasó..." rows="3" required class="w-full bg-[#252525] border border-white/5 px-6 py-4 rounded-xl text-white outline-none focus:ring-2 focus:ring-purple-500 transition"></textarea>
                             
+                            <!-- Uso de Links Gratuitos (GitHub/YouTube) -->
                             <div class="bg-black/30 p-4 rounded-xl border border-white/5">
                                 <label class="block text-[10px] font-black text-purple-500 uppercase tracking-widest mb-3">Nombre del archivo en GitHub (ej: foto.jpg) o Link YouTube</label>
                                 <input type="text" id="newsMediaUrl" placeholder="Ej: mifoto.jpg o https://youtube.com/watch..." class="w-full bg-[#252525] border border-white/5 px-4 py-3 rounded-lg text-white text-sm outline-none focus:border-purple-500 transition">
@@ -659,7 +660,7 @@
         } else {
             // TUS LLAVES REALES
             firebaseConfig = {
-                apiKey: "AIzaSyD2lj5XsTghDKNxa_RE-hk1sA8V174lk_E", 
+                apiKey: "PON_TU_API_KEY_REAL_AQUI", // 👈 RECUERDA PEGAR TU LLAVE VERDADERA AQUÍ ANTES DE SUBIR A GITHUB
                 authDomain: "vulcanobmx.firebaseapp.com",
                 projectId: "vulcanobmx",
                 storageBucket: "vulcanobmx.firebasestorage.app",
@@ -716,7 +717,7 @@
 
         // --- CARGA DE NOTICIAS ---
         const loadNews = () => {
-            if (!db || !currentUser) return;
+            if (!db) return;
             const q = collection(db, 'artifacts', currentAppId, 'public', 'data', 'news');
             
             onSnapshot(q, (snap) => {
@@ -775,14 +776,12 @@
                 const userDocRef = doc(db, 'artifacts', currentAppId, 'public', 'data', 'profiles', uid);
                 const snap = await getDoc(userDocRef);
                 
-                let data = { name: "Piloto Vulcano", level: "Iniciación", points: 250, age: "--", blood: "--", photoUrl: "", videoUrl: "" };
+                let data = { name: "Piloto Vulcano", level: "Iniciación", points: 0, age: "--", blood: "--", photoUrl: "", videoUrl: "" };
                 
                 if (snap.exists()) {
                     data = snap.data();
                 } else {
-                    // Crea ficha en blanco si es primera vez que entra un niño no creado
-                    if (auth && !auth.currentUser) await signInAnonymously(auth);
-                    await setDoc(userDocRef, { ...data, joined: new Date().toISOString() });
+                    // Si la ficha no existe, no la crea aquí, solo la muestra vacía para que el Coach la llene después.
                 }
                 
                 // Actualizar UI
@@ -833,9 +832,6 @@
 
         // --- PANEL DE ADMINISTRACIÓN (COACH) ---
         const checkAdmin = () => {
-            const adminBtn = document.getElementById('admin-tab-btn');
-            if(adminBtn) adminBtn.classList.remove('hidden'); // Muestra la pestaña Coach
-            
             if (db) {
                 onSnapshot(collection(db, 'artifacts', currentAppId, 'public', 'data', 'leads'), (snap) => {
                     const list = document.getElementById('leads-list');
@@ -891,7 +887,7 @@
                 btnText.innerHTML = '<div class="loader"></div> PROCESANDO...';
                 document.getElementById('submitLeadBtn').disabled = true;
 
-                if (db && currentUser) {
+                if (db) {
                     try {
                         const leadsRef = collection(db, 'artifacts', currentAppId, 'public', 'data', 'leads');
                         await addDoc(leadsRef, {
@@ -915,7 +911,7 @@
                 }
             });
 
-            // 🔴 CORRECCIÓN CLAVE: Lógica de Login que separa al Coach de los Pilotos
+            // 🔴 LÓGICA DE LOGIN ESTRICTA (SEPARACIÓN DE COACH Y PILOTO)
             const loginForm = document.getElementById('portalLoginForm');
             if (loginForm) {
                 loginForm.addEventListener('submit', (e) => {
@@ -929,22 +925,24 @@
 
                     window.currentLoginId = loginId;
                     
-                    // Transición visual
+                    // Transición visual principal
                     window.toggleModal('loginModal');
                     document.getElementById('public-site').classList.add('hidden');
                     document.getElementById('main-nav').classList.add('hidden');
                     document.getElementById('member-portal').classList.remove('hidden');
                     window.scrollTo(0, 0);
 
-                    // Candado de seguridad por defecto: Ocultar panel del coach
+                    // 1. CANDADO DE SEGURIDAD ESTRICTO: Por defecto todo lo de Coach se oculta
                     const adminTabBtn = document.getElementById('admin-tab-btn');
-                    if(adminTabBtn) adminTabBtn.classList.add('hidden');
+                    if(adminTabBtn) adminTabBtn.style.display = 'none'; // Se oculta forzadamente
                     document.getElementById('tab-admin').classList.add('hidden');
                     document.getElementById('tab-profile').classList.remove('hidden');
                     document.getElementById('btn-profile').className = 'px-6 py-2 bg-orange-500 rounded-full text-xs font-black uppercase text-white transition shadow-lg';
 
-                    // Si entra el Coach
+                    // 2. Si entra el Coach, se desbloquean sus herramientas
                     if (loginId === 'COACH' || loginId === 'ADMIN') {
+                        if(adminTabBtn) adminTabBtn.style.display = 'inline-block'; // Se revela solo a él
+                        
                         document.getElementById('profileName').innerText = "Coach Vulcano";
                         document.getElementById('profileIdDisplay').innerText = "COACH";
                         document.getElementById('profileLevel').innerText = "Categoría: STAFF";
@@ -964,7 +962,7 @@
                         checkAdmin();
                         window.switchTab('admin');
                     } else {
-                        // Si entra un Piloto normal
+                        // 3. Si entra un Piloto normal, el Panel de Coach se queda oculto
                         setupProfile(loginId);
                     }
                 });
@@ -986,7 +984,7 @@
                 btnTextSpan.innerHTML = '<div class="loader"></div> PUBLICANDO...';
 
                 try {
-                    if (db && currentUser) {
+                    if (db) {
                         await addDoc(collection(db, 'artifacts', currentAppId, 'public', 'data', 'news'), {
                             title: title,
                             content: content,
@@ -1006,7 +1004,7 @@
                 }
             });
 
-            // 🔴 NUEVO: Formulario Gestor de Pilotos
+            // 🔴 FORMULARIO GESTOR DE PILOTOS (Guarda directamente sin restricciones extrañas)
             const pilotForm = document.getElementById('pilotForm');
             pilotForm?.addEventListener('submit', async (e) => {
                 e.preventDefault();
@@ -1017,7 +1015,7 @@
 
                 const pid = document.getElementById('pilotIdInput').value.trim().toUpperCase();
                 
-                if (db && currentUser && pid) {
+                if (db && pid) {
                     try {
                         const profileRef = doc(db, 'artifacts', currentAppId, 'public', 'data', 'profiles', pid);
                         await setDoc(profileRef, {
@@ -1029,14 +1027,16 @@
                             photoUrl: document.getElementById('pilotPhoto').value.trim(),
                             videoUrl: document.getElementById('pilotVideo').value.trim(),
                             updatedAt: new Date().toISOString()
-                        }, { merge: true }); // Merge true evita borrar datos viejos por accidente
+                        }, { merge: true }); // Mantiene los datos viejos si dejas un campo vacío
                         
                         alert("¡Piloto " + pid + " guardado exitosamente en la base de datos!");
                         pilotForm.reset();
                     } catch (err) {
                         console.error(err);
-                        alert("Error al guardar el piloto.");
+                        alert("Error al guardar el piloto: " + err.message);
                     }
+                } else {
+                    alert("Por favor verifica tu conexión a internet y asegúrate de escribir un ID de piloto.");
                 }
                 
                 btn.innerHTML = originalText;
