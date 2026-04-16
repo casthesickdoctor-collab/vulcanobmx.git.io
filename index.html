@@ -26,7 +26,7 @@
             font-family: 'Orbitron', sans-serif;
         }
 
-        /* Botón Gradiente (image_f94303.png) */
+        /* Botón Gradiente */
         .btn-gradient {
             background: linear-gradient(to right, #f97316, #9333ea);
             transition: all 0.3s ease;
@@ -41,7 +41,7 @@
             transform: skewX(-12deg) scale(1.05);
         }
 
-        /* Botón Oscuro (image_f94303.png) */
+        /* Botón Oscuro */
         .btn-dark-grey {
             background: #333232;
             transition: all 0.3s ease;
@@ -156,12 +156,29 @@
             justify-content: center;
             transition: transform 0.3s;
         }
+
+        /* Loader para botones y carga */
+        .loader {
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top: 3px solid white;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+        .loader-orange {
+            border-top: 3px solid #f97316;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="overflow-x-hidden">
 
     <!-- WhatsApp Flotante -->
-    <a href="https://wa.me/573174321771" target="_blank" class="whatsapp-float">
+    <a href="https://wa.me/573127814421" target="_blank" class="whatsapp-float">
         <i class="fab fa-whatsapp"></i>
     </a>
 
@@ -177,6 +194,7 @@
                 <!-- Desktop Navigation -->
                 <div class="hidden lg:flex items-center space-x-6">
                     <a href="#inicio" class="text-gray-300 hover:text-orange-500 px-2 py-2 font-bold tracking-widest text-xs transition uppercase text-shadow">Inicio</a>
+                    <a href="#noticias" class="text-gray-300 hover:text-orange-500 px-2 py-2 font-bold tracking-widest text-xs transition uppercase text-shadow">Noticias</a>
                     <a href="#club" class="text-gray-300 hover:text-orange-500 px-2 py-2 font-bold tracking-widest text-xs transition uppercase text-shadow">Club</a>
                     <a href="#coach" class="text-gray-300 hover:text-orange-500 px-2 py-2 font-bold tracking-widest text-xs transition uppercase text-shadow">Coach</a>
                     <a href="#horarios" class="text-gray-300 hover:text-orange-500 px-2 py-2 font-bold tracking-widest text-xs transition uppercase text-shadow">Horarios</a>
@@ -197,6 +215,7 @@
         <div id="mobile-menu" class="lg:hidden">
             <div class="flex flex-col space-y-6 text-center mt-10">
                 <a href="#inicio" class="text-gray-200 font-black tracking-widest uppercase text-2xl mobile-link">Inicio</a>
+                <a href="#noticias" class="text-gray-200 font-black tracking-widest uppercase text-2xl mobile-link">Noticias</a>
                 <a href="#club" class="text-gray-200 font-black tracking-widest uppercase text-2xl mobile-link">El Club</a>
                 <a href="#coach" class="text-gray-200 font-black tracking-widest uppercase text-2xl mobile-link">Coach</a>
                 <a href="#horarios" class="text-gray-200 font-black tracking-widest uppercase text-2xl mobile-link">Horarios</a>
@@ -219,9 +238,9 @@
                 <h3 class="font-heading text-2xl font-bold italic uppercase text-gradient">Portal de Pilotos</h3>
             </div>
             <form id="portalLoginForm" class="space-y-4">
-                <input type="text" placeholder="ID Piloto" required class="w-full bg-zinc-800 border border-white/5 px-6 py-4 rounded-xl text-white outline-none">
-                <input type="password" placeholder="Contraseña" required class="w-full bg-zinc-800 border border-white/5 px-6 py-4 rounded-xl text-white outline-none">
-                <button type="submit" class="w-full btn-gradient py-4 rounded-xl font-black text-lg italic uppercase shadow-xl"><span>Ingresar</span></button>
+                <input type="text" id="loginId" placeholder="ID Piloto (Admin: COACH)" required class="w-full bg-zinc-800 border border-white/5 px-6 py-4 rounded-xl text-white outline-none focus:border-orange-500 transition">
+                <input type="password" id="loginPass" placeholder="Contraseña" required class="w-full bg-zinc-800 border border-white/5 px-6 py-4 rounded-xl text-white outline-none focus:border-orange-500 transition">
+                <button type="submit" class="w-full btn-gradient py-4 rounded-xl font-black text-lg italic uppercase shadow-xl text-white"><span>Ingresar</span></button>
             </form>
         </div>
     </div>
@@ -241,12 +260,26 @@
                     Velocidad, adrenalina y técnica. El club de BMX que redefine el poder en la pista.
                 </p>
                 <div class="flex flex-col sm:flex-row justify-center gap-6">
-                    <a href="#contacto" class="btn-gradient px-8 py-4 md:px-12 md:py-4 rounded-xl font-black text-sm md:text-xl tracking-widest uppercase italic">
+                    <a href="#contacto" class="btn-gradient px-8 py-4 md:px-12 md:py-4 rounded-xl font-black text-sm md:text-xl tracking-widest uppercase italic text-white">
                         <span>COMENZAR A CORRER</span>
                     </a>
-                    <a href="#horarios" class="btn-dark-grey px-8 py-4 md:px-12 md:py-4 rounded-xl font-black text-sm md:text-xl tracking-widest uppercase italic">
+                    <a href="#horarios" class="btn-dark-grey px-8 py-4 md:px-12 md:py-4 rounded-xl font-black text-sm md:text-xl tracking-widest uppercase italic text-white">
                         <span>HORARIOS</span>
                     </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN DE NOTICIAS -->
+        <section id="noticias" class="py-24 bg-zinc-950">
+            <div class="max-w-7xl mx-auto px-4 text-center">
+                <h2 class="font-heading text-4xl font-black text-white uppercase italic">NOTICIAS Y REPORTES</h2>
+                <div class="h-1.5 w-32 bg-purple-600 mx-auto rounded-full mt-4 mb-16"></div>
+                
+                <div id="news-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 text-left">
+                    <div class="col-span-full text-center text-gray-500 italic flex items-center justify-center py-10">
+                        <div class="loader loader-orange"></div> Sincronizando con la pista...
+                    </div>
                 </div>
             </div>
         </section>
@@ -265,15 +298,15 @@
                     <div class="text-left">
                         <h2 class="font-heading text-3xl md:text-5xl font-black mb-8 leading-tight text-gradient uppercase italic text-shadow">MÁS ALLÁ DE LO TRADICIONAL, CADA DÍA UN PASO ADELANTE CON CIENCIA Y CONCIENCIA</h2>
                         <p class="text-gray-400 text-lg mb-10 leading-relaxed italic">
-                            En Vulcano BMX, transformamos la pasión en resultados. Nuestro enfoque integral combina preparación física de alto nivel con técnica depurada en pista, creando el ambiente perfecto para el crecimiento de nuevos talentos y atletas de élite.
+                            En Vulcano BMX entendemos que cada niño es único. Por eso observamos su desarrollo motor, reconocemos sus fortalezas y trabajamos sobre sus cualidades para impulsar su crecimiento deportivo y personal. Nuestro compromiso es formar atletas capaces de alcanzar grandes logros, pero también personas activas, responsables, solidarias y con valores que los conviertan en verdaderos campeones dentro y fuera de la pista.
                         </p>
                         <div class="grid grid-cols-2 gap-6">
                             <div class="p-8 bg-zinc-900/50 rounded-[2rem] border border-white/5 shadow-lg">
-                                <div class="text-orange-500 text-4xl font-black mb-1">+100</div>
-                                <div class="text-gray-500 text-[10px] uppercase font-black tracking-widest">Pilotos Activos</div>
+                                <div class="text-orange-500 text-4xl font-black mb-1">Procesos</div>
+                                <div class="text-gray-500 text-[10px] uppercase font-black tracking-widest">Individuales y personalizados</div>
                             </div>
                             <div class="p-8 bg-zinc-900/50 rounded-[2rem] border border-white/5 shadow-lg">
-                                <div class="text-purple-500 text-4xl font-black mb-1">15</div>
+                                <div class="text-purple-500 text-4xl font-black mb-1">3</div>
                                 <div class="text-gray-500 text-[10px] uppercase font-black tracking-widest">Años de Exp.</div>
                             </div>
                         </div>
@@ -293,13 +326,13 @@
                     </div>
                     <div class="w-full lg:w-2/3 text-center lg:text-left">
                         <h2 class="font-heading text-4xl font-black italic text-gradient uppercase mb-8">LIDERAZGO Y EXPERIENCIA</h2>
-                        <p class="text-gray-300 text-xl italic mb-10">"Mi misión es forjar atletas de alto rendimiento y personas íntegras a través del BMX."</p>
+                        <p class="text-gray-300 text-xl italic mb-10">"Creo en la ciencia y en la investigación como herramientas para sembrar sueños desde la primera infancia y formar seres humanos capaces de crecer, creer en sí mismos y alcanzar sus metas."</p>
                         <div class="bg-black/20 p-8 rounded-[2.5rem] border border-white/5 shadow-xl">
                             <ul class="grid md:grid-cols-2 gap-6 text-gray-400 text-sm text-left">
-                                <li class="flex items-center gap-4"><i class="fas fa-certificate text-purple-500 text-lg"></i> Certificación UCI Nivel Pro</li>
-                                <li class="flex items-center gap-4"><i class="fas fa-graduation-cap text-purple-500 text-lg"></i> Lic. en Educación Física</li>
-                                <li class="flex items-center gap-4"><i class="fas fa-trophy text-purple-500 text-lg"></i> Ex-Piloto Élite Nacional</li>
-                                <li class="flex items-center gap-4"><i class="fas fa-heartbeat text-purple-500 text-lg"></i> Especialista en Biomecánica</li>
+                                <li class="flex items-center gap-4"><i class="fas fa-certificate text-purple-500 text-lg"></i> Certificación UCI Entrenador BMX</li>
+                                <li class="flex items-center gap-4"><i class="fas fa-graduation-cap text-purple-500 text-lg"></i> Entrenador Profesional COCED TE16030</li>
+                                <li class="flex items-center gap-4"><i class="fas fa-trophy text-purple-500 text-lg"></i> Ex-Piloto Élite - Master Nacional</li>
+                                <li class="flex items-center gap-4"><i class="fas fa-heartbeat text-purple-500 text-lg"></i> Especialista en Entrenamiento Infantojuvenil</li>
                             </ul>
                         </div>
                     </div>
@@ -341,7 +374,7 @@
             </div>
         </section>
 
-        <!-- Sedes (Navegación GPS Real Implementada) -->
+        <!-- Sedes -->
         <section id="ubicacion" class="py-24 bg-transparent">
             <div class="max-w-7xl mx-auto px-4 text-center">
                 <h2 class="font-heading text-3xl md:text-4xl font-black italic text-gradient uppercase mb-16 italic">NUESTRAS SEDES</h2>
@@ -358,8 +391,7 @@
                         <div class="p-10">
                             <h4 class="font-heading text-xl font-black text-white mb-3 italic uppercase italic">Pista La Pastucidad</h4>
                             <p class="text-gray-400 text-sm mb-8 italic">Pasto, Nariño.</p>
-                            <!-- Dirección real para navegación GPS -->
-                            <a href="https://www.google.com/maps/dir/?api=1&destination=Pista+Bicicross+La+Pastucidad+Pasto" target="_blank" class="block w-full py-4 border border-white/10 rounded-2xl text-center text-[10px] font-black uppercase tracking-[0.2em] hover:bg-orange-500 transition-all italic">CÓMO LLEGAR</a>
+                            <a href="https://www.google.com/maps/dir/?api=1&destination=Pista+Bicicross+La+Pastucidad+Pasto" target="_blank" class="block w-full py-4 border border-white/10 rounded-2xl text-center text-[10px] font-black uppercase tracking-[0.2em] hover:bg-orange-500 transition-all italic text-white">CÓMO LLEGAR</a>
                         </div>
                     </div>
                     <div class="bg-zinc-900/80 rounded-[2.5rem] overflow-hidden border border-white/5 shadow-2xl group">
@@ -374,8 +406,7 @@
                         <div class="p-10">
                             <h4 class="font-heading text-xl font-black text-white mb-3 italic uppercase italic">Centro Obonuco</h4>
                             <p class="text-gray-400 text-sm mb-8 italic">Centro de Acondicionamiento.</p>
-                            <!-- Dirección real para navegación GPS -->
-                            <a href="https://maps.app.goo.gl/LtaFqrETuMgNjJGFA" target="_blank" class="block w-full py-4 border border-white/10 rounded-2xl text-center text-[10px] font-black uppercase tracking-[0.2em] hover:bg-purple-500 transition-all italic">CÓMO LLEGAR</a>
+                            <a href="https://www.google.com/maps/dir/?api=1&destination=Corregimiento+Obonuco+Pasto" target="_blank" class="block w-full py-4 border border-white/10 rounded-2xl text-center text-[10px] font-black uppercase tracking-[0.2em] hover:bg-purple-500 transition-all italic text-white">CÓMO LLEGAR</a>
                         </div>
                     </div>
                     <div class="bg-zinc-900/80 rounded-[2.5rem] overflow-hidden border border-white/5 shadow-2xl group">
@@ -390,8 +421,7 @@
                         <div class="p-10">
                             <h4 class="font-heading text-xl font-black text-white mb-3 italic uppercase italic">Av. Emmanuel</h4>
                             <p class="text-gray-400 text-sm mb-8 italic">Área de técnica y velocidad.</p>
-                            <!-- Dirección real para navegación GPS -->
-                            <a href="https://www.google.com/maps/dir/?api=1&destination=Avenida+Emmanuel+Pasto" target="_blank" class="block w-full py-4 border border-white/10 rounded-2xl text-center text-[10px] font-black uppercase tracking-[0.2em] hover:bg-blue-500 transition-all italic">CÓMO LLEGAR</a>
+                            <a href="https://www.google.com/maps/dir/?api=1&destination=Avenida+Emmanuel+Pasto" target="_blank" class="block w-full py-4 border border-white/10 rounded-2xl text-center text-[10px] font-black uppercase tracking-[0.2em] hover:bg-blue-500 transition-all italic text-white">CÓMO LLEGAR</a>
                         </div>
                     </div>
                 </div>
@@ -401,7 +431,7 @@
         <!-- Videos -->
         <section id="videos" class="py-24 bg-black/40">
             <div class="max-w-7xl mx-auto px-4 text-center">
-                <h2 class="font-heading text-4xl md:text-5xl font-black italic text-gradient uppercase mb-16 italic">ACCIÓN EN LA PISTA</h2>
+                <h2 class="font-heading text-4xl md:text-5xl font-black italic text-gradient uppercase mb-16 italic">SISTEMAS ESPECIALIZADOS</h2>
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
                     <div class="rounded-[2.5rem] overflow-hidden shadow-2xl border border-white/5 bg-black">
                         <video controls class="w-full aspect-video"><source src="video1.mp4" type="video/mp4"></video>
@@ -413,13 +443,11 @@
             </div>
         </section>
 
-        <!-- Registro -->
+        <!-- Registro Únete -->
         <section id="contacto" class="py-24 bg-[#0a0a0a]">
-            <div class="max-w-5xl mx-auto px-4">
-                <div class="text-center mb-12">
-                    <h2 class="font-heading text-3xl md:text-4xl font-black italic text-gradient uppercase italic">EMPIEZA TU CARRERA HOY</h2>
-                </div>
-                <div class="bg-[#1a1a1a]/80 p-8 md:p-14 rounded-[3rem] border border-white/5 shadow-2xl">
+            <div class="max-w-5xl mx-auto px-4 text-center">
+                <h2 class="font-heading text-3xl md:text-4xl font-black italic text-gradient uppercase italic mb-12">EMPIEZA TU CARRERA HOY</h2>
+                <div class="bg-[#1a1a1a]/80 p-8 md:p-14 rounded-[3rem] border border-white/5 shadow-2xl text-left">
                     <form id="contactForm" class="grid grid-cols-1 md:grid-cols-2 gap-10">
                         <div class="space-y-6">
                             <input type="text" id="leadName" placeholder="Nombre completo" required class="w-full bg-[#252525] border border-white/5 px-6 py-5 rounded-2xl text-white outline-none focus:ring-2 focus:ring-orange-500 transition">
@@ -432,8 +460,8 @@
                         </div>
                         <div class="flex flex-col">
                             <textarea id="leadNotes" placeholder="¿Alguna duda adicional?" rows="4" class="w-full bg-[#252525] border border-white/5 px-6 py-5 rounded-2xl text-white outline-none focus:ring-2 focus:ring-orange-500 transition mb-8 flex-grow resize-none"></textarea>
-                            <button type="submit" id="submitLeadBtn" class="w-full btn-gradient py-5 rounded-2xl font-black text-lg italic uppercase shadow-2xl tracking-widest">
-                                <span>ENVIAR SOLICITUD</span>
+                            <button type="submit" id="submitLeadBtn" class="w-full btn-gradient py-5 rounded-2xl font-black text-lg italic uppercase shadow-2xl tracking-widest text-white flex items-center justify-center">
+                                <span id="submitLeadText">ENVIAR SOLICITUD</span>
                             </button>
                         </div>
                     </form>
@@ -443,41 +471,55 @@
         </section>
     </div>
 
-    <!-- Portal Miembros - Implementado -->
+    <!-- Portal Miembros -->
     <div id="member-portal" class="hidden min-h-screen bg-zinc-950 pt-24 px-4 pb-12">
         <div class="max-w-7xl mx-auto">
             <div class="flex justify-between items-center mb-12 border-b border-white/5 pb-8">
                 <h2 class="font-heading text-2xl font-black italic uppercase text-gradient">Dashboard Piloto</h2>
-                <button onclick="window.logout()" class="px-6 py-2 bg-red-500/10 border border-red-500/20 rounded-full text-xs font-black text-red-500 uppercase">SALIR</button>
+                <button onclick="window.logout()" class="px-6 py-2 bg-red-500/10 border border-red-500/20 rounded-full text-xs font-black text-red-500 uppercase hover:bg-red-500 hover:text-white transition">SALIR</button>
             </div>
-            <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
-                <!-- Ficha del Deportista -->
+
+            <!-- Navegación de Pestañas del Portal -->
+            <div class="flex space-x-4 mb-8" id="portal-tabs">
+                <button onclick="window.switchTab('profile')" id="btn-profile" class="px-6 py-2 bg-orange-500 rounded-full text-xs font-black uppercase text-white transition shadow-lg">Mi Ficha</button>
+                <button id="admin-tab-btn" onclick="window.switchTab('admin')" class="hidden px-6 py-2 bg-white/10 rounded-full text-xs font-black uppercase text-white hover:bg-purple-600 transition">Panel Coach</button>
+            </div>
+
+            <!-- Pestaña 1: Ficha del Deportista -->
+            <div id="tab-profile" class="grid grid-cols-1 lg:grid-cols-4 gap-8">
                 <div class="lg:col-span-1 space-y-6">
-                    <div class="bg-zinc-900 p-8 rounded-[3rem] border border-white/5 text-center lg:text-left shadow-2xl">
-                        <div class="w-24 h-24 bg-gradient-to-br from-orange-500 to-purple-600 rounded-3xl flex items-center justify-center text-4xl mx-auto lg:mx-0 mb-6 shadow-lg">
-                            <i class="fas fa-user-ninja text-white"></i>
+                    <div class="bg-zinc-900 p-8 rounded-[3rem] border border-white/5 text-center lg:text-left shadow-2xl relative overflow-hidden">
+                        <div class="w-32 h-32 mx-auto lg:mx-0 mb-6 relative">
+                            <img id="profilePhotoImg" src="" class="w-full h-full object-cover rounded-3xl border-2 border-orange-500 hidden z-10 relative">
+                            <div id="profileNinjaIcon" class="absolute inset-0 bg-gradient-to-br from-orange-500 to-purple-600 rounded-3xl flex items-center justify-center text-5xl shadow-lg">
+                                <i class="fas fa-user-ninja text-white"></i>
+                            </div>
                         </div>
+
                         <h4 class="text-xl font-black text-white mb-1" id="profileName">Cargando...</h4>
-                        <p class="text-orange-500 text-[10px] uppercase font-black tracking-widest mb-6" id="profileLevel">Categoría: Iniciación</p>
-                        <p class="text-gray-500 text-[10px] uppercase font-black" id="profileId">ID: VUL-000</p>
+                        <p class="text-orange-500 text-[10px] uppercase font-black tracking-widest mb-6" id="profileLevel">Categoría: BMX</p>
                         
                         <div class="mt-8 pt-8 border-t border-white/5 space-y-4">
                             <div class="flex justify-between items-center text-xs">
-                                <span class="text-gray-500 font-bold uppercase tracking-widest">Puntos Club</span>
+                                <span class="text-gray-500 font-bold uppercase tracking-widest">ID Club</span>
+                                <span class="text-white font-black" id="profileIdDisplay">VUL-000</span>
+                            </div>
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="text-gray-500 font-bold uppercase tracking-widest">Puntos</span>
                                 <span class="text-white font-black" id="profilePoints">0</span>
                             </div>
                             <div class="flex justify-between items-center text-xs">
-                                <span class="text-gray-500 font-bold uppercase tracking-widest">Asistencia</span>
-                                <span class="text-white font-black">95%</span>
+                                <span class="text-gray-500 font-bold uppercase tracking-widest">Edad</span>
+                                <span class="text-white font-black" id="profileAge">--</span>
                             </div>
                             <div class="flex justify-between items-center text-xs">
-                                <span class="text-gray-500 font-bold uppercase tracking-widest">Ranking</span>
-                                <span class="text-purple-500 font-black">#04</span>
+                                <span class="text-gray-500 font-bold uppercase tracking-widest">Sangre</span>
+                                <span class="text-red-500 font-black" id="profileBlood">--</span>
                             </div>
                         </div>
                     </div>
                 </div>
-                <!-- Dashboard Principal -->
+
                 <div class="lg:col-span-3 space-y-8">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="bg-zinc-900 p-10 rounded-[3rem] border border-white/5 shadow-xl">
@@ -490,19 +532,42 @@
                         <div class="bg-zinc-900 p-10 rounded-[3rem] border border-white/5 shadow-xl">
                             <h5 class="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-4">Próxima Competencia</h5>
                             <span class="text-white text-xl font-black italic uppercase">Copa Nariño BMX</span>
-                            <p class="text-gray-500 text-xs mt-2 italic font-bold">FECHA: 25 ABRIL</p>
+                            <p class="text-gray-500 text-xs mt-2 italic font-bold">Pasto, Nariño</p>
                         </div>
                     </div>
-                    <div class="lg:col-span-3 bg-zinc-900 p-10 rounded-[3rem] border border-white/5 shadow-2xl">
-                        <h3 class="font-heading text-xl font-black italic text-white mb-8 uppercase tracking-widest border-b border-white/5 pb-4">ANUNCIOS DEL CLUB</h3>
-                        <div class="space-y-6">
-                            <div class="p-6 bg-black/40 rounded-2xl border-l-4 border-orange-500">
-                                <h6 class="text-white font-bold mb-2 uppercase text-sm">Entrenamiento Especial</h6>
-                                <p class="text-gray-400 text-sm">Este sábado 4 de mayo tendremos clínica de saltos en la primera recta. Todos los pilotos de nivel competitivo deben asistir con su kit de protección completo.</p>
-                                <span class="text-[10px] text-gray-600 block mt-4 font-black uppercase italic">Publicado por Coach • Hace 2 horas</span>
-                            </div>
+                </div>
+            </div>
+
+            <!-- Pestaña 2: Administración -->
+            <div id="tab-admin" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-8 text-left">
+                <!-- Formulario de Noticias adaptado para GitHub -->
+                <div class="bg-zinc-900 p-8 rounded-[3rem] border border-white/5 shadow-2xl">
+                    <h3 class="font-heading text-xl font-black text-white uppercase italic mb-8 border-b border-white/5 pb-4 tracking-widest">Publicar en el Muro</h3>
+                    <form id="newsForm" class="space-y-5">
+                        <input type="text" id="newsTitle" placeholder="Título de la publicación" required class="w-full bg-[#252525] border border-white/5 px-6 py-4 rounded-xl text-white outline-none focus:ring-2 focus:ring-purple-500 transition">
+                        <textarea id="newsContent" placeholder="Describe lo que pasó..." rows="3" required class="w-full bg-[#252525] border border-white/5 px-6 py-4 rounded-xl text-white outline-none focus:ring-2 focus:ring-purple-500 transition"></textarea>
+                        
+                        <!-- Uso de Links Gratuitos (GitHub/YouTube) -->
+                        <div class="bg-black/30 p-4 rounded-xl border border-white/5">
+                            <label class="block text-[10px] font-black text-purple-500 uppercase tracking-widest mb-3">Nombre del archivo en GitHub (ej: foto.jpg) o Link YouTube</label>
+                            <input type="text" id="newsMediaUrl" placeholder="Ej: mifoto.jpg o https://youtube.com/watch..." class="w-full bg-[#252525] border border-white/5 px-4 py-3 rounded-lg text-white text-sm outline-none focus:border-purple-500 transition">
                         </div>
-                    </div>
+
+                        <select id="newsMediaType" class="w-full bg-[#252525] border border-white/5 px-6 py-4 rounded-xl text-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                            <option value="image">Tipo: Imagen (en mi GitHub)</option>
+                            <option value="video">Tipo: Video YouTube (Link)</option>
+                            <option value="text">Tipo: Solo Texto</option>
+                        </select>
+                        <button type="submit" id="newsSubmitBtn" class="w-full btn-gradient py-4 rounded-xl font-black uppercase italic shadow-lg text-white flex justify-center items-center">
+                            <span id="newsBtnText">PUBLICAR NOTICIA</span>
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Lista de Leads -->
+                <div class="bg-zinc-900 p-8 rounded-[3rem] border border-white/5 shadow-2xl">
+                    <h3 class="font-heading text-xl font-black text-white uppercase italic mb-8 border-b border-white/5 pb-4 tracking-widest">Registros de la Web</h3>
+                    <div id="leads-list" class="space-y-4 overflow-y-auto max-h-[600px] pr-2 text-sm italic text-gray-500">Cargando la lista de prospectos...</div>
                 </div>
             </div>
         </div>
@@ -518,77 +583,234 @@
         <p class="text-gray-600 text-[10px] font-black uppercase tracking-[0.4em]">© 2024 VULCANO BMX NARIÑO • DISCIPLINA • RESPETO</p>
     </footer>
 
-    <!-- Firebase y Lógica -->
+    <!-- FIREBASE Y LÓGICA DE LA APLICACIÓN -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        let firebaseConfig = { apiKey: "AIzaSyD2lj5XsTghDKNxa_RE-hK1sA8V174lk_E" };
-        try {
-            if (typeof __firebase_config !== 'undefined') { firebaseConfig = JSON.parse(__firebase_config); }
-        } catch(e) {}
+        // 🔴 ¡ATENCIÓN CARLOS ARTURO! PEGA AQUÍ TU CONFIGURACIÓN REAL 🔴
+        // Borra los datos de ejemplo de abajo y pega los que te da Firebase en "Configuración del proyecto" -> "Tus apps"
+        let firebaseConfig = {
+            apiKey: "¡¡¡PEGA_AQUÍ_TU_API_KEY_REAL!!!", 
+            authDomain: "vulcanobmx.firebaseapp.com",
+            projectId: "vulcanobmx",
+            storageBucket: "vulcanobmx.firebasestorage.app",
+            messagingSenderId: "196835151646",
+            appId: "1:196835151646:web:8962502338d42dc817830f",
+            measurementId: "G-LQRF132K8V"
+        };
 
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'vulcano-bmx-prod';
+        // Prevención de errores de entorno
+        let appIdValue = 'vulcanobmx';
+        if (typeof __firebase_config !== 'undefined') {
+            try {
+                const envConfig = JSON.parse(__firebase_config);
+                if (envConfig && envConfig.apiKey && envConfig.apiKey.length > 5) {
+                    firebaseConfig = envConfig;
+                    appIdValue = typeof __app_id !== 'undefined' ? __app_id : 'vulcanobmx';
+                }
+            } catch (e) { }
+        }
+
         let auth, db, currentUser = null;
 
+        // --- FUNCIONES GLOBALES PARA EL HTML ---
+        window.toggleModal = (id) => {
+            const el = document.getElementById(id);
+            if (el) el.classList.toggle('hidden');
+        };
+        
+        window.logout = () => window.location.reload();
+        
+        window.switchTab = (t) => {
+            document.getElementById('tab-profile')?.classList.toggle('hidden', t !== 'profile');
+            document.getElementById('tab-admin')?.classList.toggle('hidden', t !== 'admin');
+            const btnP = document.getElementById('btn-profile');
+            const btnA = document.getElementById('admin-tab-btn');
+            if(btnP) btnP.className = t === 'profile' ? 'px-6 py-2 bg-orange-500 rounded-full text-xs font-black text-white transition shadow-lg' : 'px-6 py-2 bg-white/10 rounded-full text-xs font-black text-white hover:bg-orange-600 transition';
+            if(btnA) btnA.className = t === 'admin' ? 'px-6 py-2 bg-purple-600 rounded-full text-xs font-black text-white transition shadow-lg' : 'px-6 py-2 bg-white/10 rounded-full text-xs font-black text-white hover:bg-purple-600 transition';
+        };
+
+        // --- INICIALIZACIÓN DEL SISTEMA ---
         const startApp = async () => {
-            if (firebaseConfig.apiKey && firebaseConfig.apiKey !== "") {
-                try {
-                    const app = initializeApp(firebaseConfig);
-                    auth = getAuth(app);
-                    db = getFirestore(app);
+            try {
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
 
-                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                        await signInWithCustomToken(auth, __initial_auth_token);
-                    } else {
-                        await signInAnonymously(auth);
+                // Inicio de sesión anónimo obligatorio para escribir en Firestore
+                await signInAnonymously(auth);
+
+                // Esperar a que el usuario exista antes de leer la base de datos
+                onAuthStateChanged(auth, async (user) => {
+                    currentUser = user;
+                    if (user) {
+                        loadNews();
                     }
-
-                    onAuthStateChanged(auth, async (user) => {
-                        currentUser = user;
-                        if (user) {
-                            const nameEl = document.getElementById('profileName');
-                            const idEl = document.getElementById('profileId');
-                            const levelEl = document.getElementById('profileLevel');
-                            const pointsEl = document.getElementById('profilePoints');
-                            
-                            const userDocRef = doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'data');
-                            try {
-                                const snap = await getDoc(userDocRef);
-                                if (!snap.exists()) {
-                                    await setDoc(userDocRef, { name: "Piloto Vulcano", level: "Iniciación", points: 250, joined: new Date() });
-                                }
-                                const data = snap.exists() ? snap.data() : { name: "Piloto Vulcano", level: "Iniciación", points: 250 };
-                                if(nameEl) nameEl.innerText = data.name;
-                                if(levelEl) levelEl.innerText = "Categoría: " + data.level;
-                                if(pointsEl) pointsEl.innerText = data.points;
-                                if(idEl) idEl.innerText = "ID: " + user.uid.substring(0, 8).toUpperCase();
-                            } catch(e) {}
-                        }
-                    });
-                } catch(err) { console.warn("Modo demostración."); }
+                });
+            } catch (err) {
+                console.error("Error conectando con Firebase:", err);
+                const newsContainer = document.getElementById('news-container');
+                if (newsContainer) {
+                    newsContainer.innerHTML = '<div class="col-span-full text-center text-red-500 py-10 italic font-bold">Error de conexión: Revisa tu internet o la configuración de Firebase. Asegúrate de poner tu apiKey real.</div>';
+                }
             }
         };
 
+        // --- CARGA DE NOTICIAS ---
+        const loadNews = () => {
+            if (!db || !currentUser) return;
+            const q = collection(db, 'artifacts', appIdValue, 'public', 'data', 'news');
+            
+            onSnapshot(q, (snap) => {
+                const container = document.getElementById('news-container');
+                if (!container) return;
+                container.innerHTML = '';
+                
+                if (snap.empty) {
+                    container.innerHTML = '<div class="col-span-full text-center text-gray-600 py-10 italic">Aún no hay noticias publicadas. ¡Sé el primero!</div>';
+                    return;
+                }
+
+                const docs = [];
+                snap.forEach(d => docs.push(d.data()));
+                
+                docs.reverse().forEach(d => {
+                    const card = document.createElement('div');
+                    card.className = "bg-zinc-900 p-8 rounded-[2rem] border border-white/5 shadow-2xl text-left flex flex-col h-full";
+                    
+                    let mediaHtml = '';
+                    if (d.mediaUrl) {
+                        if (d.mediaType === 'image') {
+                            mediaHtml = `<img src="${d.mediaUrl}" class="rounded-2xl w-full h-48 object-cover mt-auto shadow-lg" alt="Noticia" onerror="this.style.display='none'">`;
+                        } else if (d.mediaType === 'video') {
+                            let embedUrl = d.mediaUrl;
+                            if (embedUrl.includes('watch?v=')) {
+                                embedUrl = embedUrl.replace('watch?v=', 'embed/').split('&')[0];
+                            } else if (embedUrl.includes('youtu.be/')) {
+                                embedUrl = embedUrl.replace('youtu.be/', 'youtube.com/embed/');
+                            }
+                            mediaHtml = `<iframe class="w-full aspect-video rounded-2xl mt-auto shadow-lg" src="${embedUrl}" frameborder="0" allowfullscreen></iframe>`;
+                        }
+                    }
+
+                    card.innerHTML = `
+                        <h4 class="font-heading text-orange-500 font-black italic uppercase text-lg mb-2">${d.title}</h4>
+                        <p class="text-gray-400 text-sm italic leading-relaxed mb-6">${d.content}</p>
+                        ${mediaHtml}
+                    `;
+                    container.appendChild(card);
+                });
+            }, (error) => {
+                console.error("Error al descargar noticias:", error);
+            });
+        };
+
+        // --- CARGAR PERFIL DE DEPORTISTA ---
+        const setupProfile = async (uid) => {
+            if (!uid || !db || !currentUser) return;
+            const userDocRef = doc(db, 'artifacts', appIdValue, 'users', uid, 'profile', 'data');
+            
+            try {
+                const snap = await getDoc(userDocRef);
+                let data = { name: "Piloto Vulcano", level: "Iniciación", points: 0, age: "--", blood: "--", photoUrl: "" };
+                
+                if (snap.exists()) {
+                    data = snap.data();
+                } else {
+                    await setDoc(userDocRef, { ...data, joined: new Date() });
+                }
+                
+                if(document.getElementById('profileName')) document.getElementById('profileName').innerText = data.name || "Piloto Vulcano";
+                if(document.getElementById('profileLevel')) document.getElementById('profileLevel').innerText = "Categoría: " + (data.level || "Iniciación");
+                if(document.getElementById('profileIdDisplay')) document.getElementById('profileIdDisplay').innerText = uid;
+                if(document.getElementById('profilePoints')) document.getElementById('profilePoints').innerText = data.points || 0;
+                if(document.getElementById('profileAge')) document.getElementById('profileAge').innerText = data.age || "--";
+                if(document.getElementById('profileBlood')) document.getElementById('profileBlood').innerText = data.blood || "--";
+                
+                const photoImg = document.getElementById('profilePhotoImg');
+                const ninjaIcon = document.getElementById('profileNinjaIcon');
+                
+                if (data.photoUrl && photoImg) {
+                    photoImg.src = data.photoUrl;
+                    photoImg.classList.remove('hidden');
+                    if(ninjaIcon) ninjaIcon.classList.add('hidden');
+                }
+            } catch (e) {
+                console.error("Error cargando el perfil del deportista.", e);
+            }
+        };
+
+        // --- PANEL DE ADMINISTRACIÓN (COACH) ---
+        const checkAdmin = () => {
+            const inputId = window.currentLoginId || "";
+            if (db && currentUser && inputId.toUpperCase().includes("COACH")) {
+                const adminBtn = document.getElementById('admin-tab-btn');
+                if(adminBtn) adminBtn.classList.remove('hidden');
+                
+                onSnapshot(collection(db, 'artifacts', appIdValue, 'public', 'data', 'leads'), (snap) => {
+                    const list = document.getElementById('leads-list');
+                    if (!list) return;
+                    list.innerHTML = '';
+                    
+                    if (snap.empty) {
+                        list.innerHTML = '<p class="text-gray-500 italic text-center">No hay registros nuevos en la web.</p>';
+                        return;
+                    }
+
+                    snap.docs.forEach(doc => {
+                        const d = doc.data();
+                        const item = document.createElement('div');
+                        item.className = "bg-black/30 p-5 rounded-2xl border border-white/5 mb-3";
+                        item.innerHTML = `
+                            <div class="flex justify-between mb-2">
+                                <span class="text-orange-500 font-black text-xs uppercase">${d.name || 'Sin nombre'}</span>
+                                <span class="bg-purple-600/20 text-purple-400 px-2 py-0.5 rounded text-[8px] font-black">${d.level || '-'}</span>
+                            </div>
+                            <div class="text-white text-sm font-bold"><i class="fab fa-whatsapp mr-2 text-green-500"></i>${d.phone || 'Sin teléfono'}</div>
+                            <div class="text-gray-500 text-[10px] mt-2 italic border-t border-white/5 pt-2">${d.notes || 'Sin preguntas adicionales.'}</div>
+                        `;
+                        list.appendChild(item);
+                    });
+                }, (error) => {
+                    console.error("Error al descargar leads:", error);
+                });
+            }
+        };
+
+        // --- EVENTOS DE LA PÁGINA ---
         document.addEventListener('DOMContentLoaded', () => {
             startApp();
 
+            const mb = document.getElementById('menu-btn');
+            const mm = document.getElementById('mobile-menu');
+            mb?.addEventListener('click', () => {
+                const active = mm.classList.toggle('active');
+                mb.innerHTML = active ? '<i class="fas fa-times text-2xl text-white"></i>' : '<i class="fas fa-bars text-2xl text-white"></i>';
+            });
+            document.querySelectorAll('.mobile-link').forEach(link => {
+                link.addEventListener('click', () => {
+                    mm?.classList.remove('active');
+                    if(mb) mb.innerHTML = '<i class="fas fa-bars text-2xl text-white"></i>';
+                });
+            });
+
+            // Formulario Público: Únete
             const contactForm = document.getElementById('contactForm');
-            const loginForm = document.getElementById('portalLoginForm');
-            const menuBtn = document.getElementById('menu-btn');
-            const mobileMenu = document.getElementById('mobile-menu');
+            contactForm?.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const btnText = document.getElementById('submitLeadText');
+                
+                const originalText = btnText.innerHTML;
+                btnText.innerHTML = '<div class="loader"></div> PROCESANDO...';
+                document.getElementById('submitLeadBtn').disabled = true;
 
-            if (contactForm) {
-                contactForm.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    const btn = document.getElementById('submitLeadBtn');
-                    btn.disabled = true;
-                    btn.innerText = "ENVIANDO...";
-
+                let retries = 0;
+                const attemptSend = async () => {
                     if (db && currentUser) {
                         try {
-                            const leadsRef = collection(db, 'artifacts', appId, 'public', 'data', 'leads');
+                            const leadsRef = collection(db, 'artifacts', appIdValue, 'public', 'data', 'leads');
                             await addDoc(leadsRef, {
                                 name: document.getElementById('leadName').value,
                                 phone: document.getElementById('leadPhone').value,
@@ -596,77 +818,90 @@
                                 notes: document.getElementById('leadNotes').value,
                                 timestamp: new Date()
                             });
-                        } catch(err) { console.error(err); }
+                            contactForm.classList.add('hidden');
+                            document.getElementById('formStatus').classList.remove('hidden');
+                        } catch(err) {
+                            console.error("Error al enviar.", err);
+                            btnText.innerHTML = originalText;
+                            document.getElementById('submitLeadBtn').disabled = false;
+                            alert("Hubo un error de conexión. Asegúrate de tener Internet y de haber pegado tus llaves correctamente en el código.");
+                        }
+                    } else if (retries < 5) {
+                        retries++;
+                        setTimeout(attemptSend, 1000);
+                    } else {
+                        btnText.innerHTML = originalText;
+                        document.getElementById('submitLeadBtn').disabled = false;
+                        alert("No se pudo conectar a Firebase. Asegúrate de pegar tu API_KEY correcta en el archivo.");
                     }
-                    
-                    setTimeout(() => {
-                        contactForm.classList.add('hidden');
-                        document.getElementById('formStatus').classList.remove('hidden');
-                    }, 1000);
-                });
-            }
-
-            if (loginForm) {
-                loginForm.addEventListener('submit', (e) => {
-                    e.preventDefault();
-                    window.toggleModal('loginModal');
-                    document.getElementById('public-site').classList.add('hidden');
-                    document.getElementById('main-footer').classList.add('hidden');
-                    document.getElementById('main-nav').classList.add('hidden');
-                    document.getElementById('member-portal').classList.remove('hidden');
-                    window.scrollTo(0, 0);
-                });
-            }
-
-            if (menuBtn && mobileMenu) {
-                menuBtn.addEventListener('click', (e) => {
-                    e.preventDefault(); e.stopPropagation();
-                    const active = mobileMenu.classList.toggle('active');
-                    menuBtn.querySelector('i').className = active ? 'fas fa-times text-2xl' : 'fas fa-bars text-2xl';
-                    document.body.style.overflow = active ? 'hidden' : '';
-                });
-            }
-
-            document.querySelectorAll('.mobile-link').forEach(link => {
-                link.addEventListener('click', () => {
-                    if (mobileMenu) mobileMenu.classList.remove('active');
-                    if (menuBtn) menuBtn.querySelector('i').className = 'fas fa-bars text-2xl';
-                    document.body.style.overflow = '';
-                });
+                };
+                
+                attemptSend();
             });
 
-            const video = document.getElementById('heroVideo');
-            if (video) { video.muted = true; video.play().catch(() => {}); }
+            // Formulario Login Portal
+            const loginForm = document.getElementById('portalLoginForm');
+            loginForm?.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const loginId = document.getElementById('loginId').value.trim();
+                
+                window.currentLoginId = loginId;
+                
+                window.toggleModal('loginModal');
+                document.getElementById('public-site').classList.add('hidden');
+                document.getElementById('main-nav').classList.add('hidden');
+                document.getElementById('member-portal').classList.remove('hidden');
+                window.scrollTo(0, 0);
 
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    const targetId = this.getAttribute('href');
-                    if(targetId === '#' || !targetId.startsWith('#')) return;
-                    e.preventDefault();
-                    const target = document.querySelector(targetId);
-                    if (target) window.scrollTo({ top: target.offsetTop - 64, behavior: 'smooth' });
-                });
+                if (!loginId.toUpperCase().includes('COACH')) {
+                    setupProfile(loginId);
+                } else {
+                    checkAdmin();
+                }
             });
+
+            // Formulario Subir Noticias
+            const newsForm = document.getElementById('newsForm');
+            newsForm?.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const btn = document.getElementById('newsSubmitBtn');
+                const btnTextSpan = document.getElementById('newsBtnText');
+                
+                const title = document.getElementById('newsTitle').value;
+                const content = document.getElementById('newsContent').value;
+                const mediaUrl = document.getElementById('newsMediaUrl').value.trim();
+                const mediaType = document.getElementById('newsMediaType').value;
+                
+                btn.disabled = true;
+                btnTextSpan.innerHTML = '<div class="loader"></div> PUBLICANDO...';
+
+                try {
+                    if (db && currentUser) {
+                        await addDoc(collection(db, 'artifacts', appIdValue, 'public', 'data', 'news'), {
+                            title: title,
+                            content: content,
+                            mediaUrl: mediaUrl,
+                            mediaType: mediaType,
+                            timestamp: new Date()
+                        });
+                        
+                        e.target.reset();
+                        alert("¡Noticia publicada con éxito! Revisa la página principal.");
+                    } else {
+                        alert("Error de conexión. Intenta de nuevo en unos segundos.");
+                    }
+                } catch(err) {
+                    console.error("Error subiendo la noticia:", err);
+                    alert("No se pudo publicar la noticia.");
+                } finally {
+                    btn.disabled = false;
+                    btnTextSpan.innerHTML = 'PUBLICAR NOTICIA';
+                }
+            });
+
+            const heroVid = document.getElementById('heroVideo');
+            if (heroVid) { heroVid.muted = true; heroVid.play().catch(() => {}); }
         });
-
-        window.toggleModal = (id) => {
-            const el = document.getElementById(id);
-            if (el) el.classList.toggle('hidden');
-            const mm = document.getElementById('mobile-menu');
-            if (mm && mm.classList.contains('active')) {
-                mm.classList.remove('active');
-                const mb = document.getElementById('menu-btn');
-                if (mb) mb.querySelector('i').className = 'fas fa-bars text-2xl';
-            }
-        };
-
-        window.logout = () => {
-            document.getElementById('member-portal').classList.add('hidden');
-            document.getElementById('public-site').classList.remove('hidden');
-            document.getElementById('main-footer').classList.remove('hidden');
-            document.getElementById('main-nav').classList.remove('hidden');
-            window.scrollTo(0, 0);
-        };
     </script>
 </body>
 </html>
