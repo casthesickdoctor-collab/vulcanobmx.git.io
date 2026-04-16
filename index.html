@@ -237,7 +237,6 @@
                 <h3 class="font-heading text-2xl font-bold italic uppercase text-gradient">Portal de Pilotos</h3>
             </div>
             <form id="portalLoginForm" class="space-y-4">
-                <!-- ID Piloto Reconocido -->
                 <input type="text" id="loginId" placeholder="ID Piloto (Coach usa: COACH)" required class="w-full bg-zinc-800 border border-white/5 px-6 py-4 rounded-xl text-white outline-none focus:border-orange-500 transition">
                 <input type="password" id="loginPass" placeholder="Contraseña" required class="w-full bg-zinc-800 border border-white/5 px-6 py-4 rounded-xl text-white outline-none focus:border-orange-500 transition">
                 <button type="submit" class="w-full btn-gradient py-4 rounded-xl font-black text-lg italic uppercase shadow-xl text-white"><span>Ingresar</span></button>
@@ -522,42 +521,141 @@
 
                 <div class="lg:col-span-3 space-y-8">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Mensualidad Dinámica -->
                         <div class="bg-zinc-900 p-10 rounded-[3rem] border border-white/5 shadow-xl">
                             <h5 class="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-4">Estado de Mensualidad</h5>
                             <div class="flex items-center gap-4">
-                                <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                                <span class="text-white text-xl font-black italic uppercase">Al día</span>
+                                <div id="paymentDot" class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                                <span id="profilePaymentStatus" class="text-white text-xl font-black italic uppercase">Al día</span>
                             </div>
                         </div>
+                        <!-- Competencia Dinámica -->
                         <div class="bg-zinc-900 p-10 rounded-[3rem] border border-white/5 shadow-xl">
                             <h5 class="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-4">Próxima Competencia</h5>
-                            <span class="text-white text-xl font-black italic uppercase">Copa Nariño BMX</span>
-                            <p class="text-gray-500 text-xs mt-2 italic font-bold">Pasto, Nariño</p>
+                            <span id="profileNextRace" class="text-white text-xl font-black italic uppercase">Copa Nariño BMX</span>
+                            <p id="profileNextRaceLocation" class="text-gray-500 text-xs mt-2 italic font-bold">Pasto, Nariño</p>
                         </div>
                     </div>
 
-                    <!-- NUEVO: Contenedor de Video del Piloto -->
+                    <!-- NUEVO: Contenedor Principal de Video Base (Video Destacado general) -->
                     <div id="profileVideoContainer" class="hidden bg-zinc-900 p-10 rounded-[3rem] border border-white/5 shadow-2xl">
                         <h3 class="font-heading text-xl font-black italic text-gradient uppercase mb-6 tracking-widest border-b border-white/5 pb-4">Video Destacado del Piloto</h3>
                         <iframe id="profileVideoIframe" class="w-full aspect-video rounded-2xl shadow-lg border border-white/10" src="" frameborder="0" allowfullscreen></iframe>
                     </div>
+
+                    <!-- NUEVO: SECCIÓN REPORTE DEL COACH (Evolución y Notas) -->
+                    <div id="profileCoachReportContainer" class="hidden bg-zinc-900 p-10 rounded-[3rem] border border-white/5 shadow-2xl mt-8">
+                        <h3 class="font-heading text-xl font-black text-orange-500 uppercase italic mb-6 tracking-widest border-b border-white/5 pb-4">
+                            <i class="fas fa-clipboard-check mr-2"></i> Reporte Técnico del Coach
+                        </h3>
+                        <p id="profileCoachNotes" class="text-gray-300 text-sm leading-relaxed italic mb-8"></p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Imagen de progreso -->
+                            <img id="profileReportImage" src="" class="hidden w-full h-auto rounded-2xl shadow-lg border border-white/10 object-cover" alt="Reporte Piloto">
+                            <!-- Video de progreso -->
+                            <iframe id="profileReportVideo" class="hidden w-full aspect-video rounded-2xl shadow-lg border border-white/10" src="" frameborder="0" allowfullscreen></iframe>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
             <!-- Pestaña 2: Administración -->
             <div id="tab-admin" class="hidden text-left space-y-8">
                 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- GESTOR DE PILOTOS (AHORA CON MENSUALIDAD, COMPETENCIA Y REPORTE DEL COACH) -->
+                <div class="bg-zinc-900 p-8 rounded-[3rem] border border-orange-500/20 shadow-2xl w-full">
+                    <h3 class="font-heading text-2xl font-black text-orange-500 uppercase italic mb-2 tracking-widest">Gestor Maestro de Pilotos</h3>
+                    <p class="text-gray-400 text-sm mb-8 italic border-b border-white/5 pb-4">Crea nuevos pilotos o actualiza los datos, estado y reportes técnicos de los existentes.</p>
+                    
+                    <form id="pilotForm" class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <!-- Datos Básicos -->
+                            <div class="lg:col-span-3 border-b border-white/5 pb-4 mb-2"><h4 class="text-white font-bold uppercase text-xs tracking-widest">1. Datos Básicos</h4></div>
+
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">ID Único del Piloto *</label>
+                                <input type="text" id="pilotIdInput" placeholder="Ej: MATEO01" required class="w-full bg-[#252525] border border-white/5 px-4 py-3 rounded-xl text-white outline-none focus:ring-2 focus:ring-orange-500 transition">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Nombre Completo *</label>
+                                <input type="text" id="pilotName" placeholder="Ej: Mateo Rodríguez" required class="w-full bg-[#252525] border border-white/5 px-4 py-3 rounded-xl text-white outline-none focus:ring-2 focus:ring-orange-500 transition">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Categoría *</label>
+                                <input type="text" id="pilotLevel" placeholder="Ej: Iniciación, Élite..." required class="w-full bg-[#252525] border border-white/5 px-4 py-3 rounded-xl text-white outline-none focus:ring-2 focus:ring-orange-500 transition">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Puntos del Club</label>
+                                <input type="number" id="pilotPoints" placeholder="Ej: 250" class="w-full bg-[#252525] border border-white/5 px-4 py-3 rounded-xl text-white outline-none focus:ring-2 focus:ring-orange-500 transition">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Edad</label>
+                                <input type="text" id="pilotAge" placeholder="Ej: 10 años" class="w-full bg-[#252525] border border-white/5 px-4 py-3 rounded-xl text-white outline-none focus:ring-2 focus:ring-orange-500 transition">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Tipo de Sangre</label>
+                                <input type="text" id="pilotBlood" placeholder="Ej: O+" class="w-full bg-[#252525] border border-white/5 px-4 py-3 rounded-xl text-white outline-none focus:ring-2 focus:ring-orange-500 transition">
+                            </div>
+                            <div class="lg:col-span-3">
+                                <label class="block text-[10px] font-black text-orange-500 uppercase tracking-widest mb-2">Link Foto de Perfil Principal (En tu GitHub)</label>
+                                <input type="text" id="pilotPhoto" placeholder="Ej: mateo-perfil.jpg" class="w-full bg-[#252525] border border-white/5 px-4 py-3 rounded-xl text-white outline-none focus:ring-2 focus:ring-orange-500 transition">
+                            </div>
+
+                            <!-- Estado y Competencias -->
+                            <div class="lg:col-span-3 border-b border-white/5 pb-4 mt-4 mb-2"><h4 class="text-white font-bold uppercase text-xs tracking-widest">2. Estado y Competencias</h4></div>
+                            
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Estado Mensualidad</label>
+                                <select id="pilotPayment" class="w-full bg-[#252525] border border-white/5 px-4 py-3 rounded-xl text-white outline-none focus:ring-2 focus:ring-orange-500 transition appearance-none cursor-pointer">
+                                    <option value="Al día">🟢 Al día</option>
+                                    <option value="Pendiente">🔴 Pendiente / En mora</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Próxima Competencia</label>
+                                <input type="text" id="pilotRace" placeholder="Ej: Copa Nariño BMX" class="w-full bg-[#252525] border border-white/5 px-4 py-3 rounded-xl text-white outline-none focus:ring-2 focus:ring-orange-500 transition">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Ubicación Competencia</label>
+                                <input type="text" id="pilotRaceLoc" placeholder="Ej: Pasto, Nariño" class="w-full bg-[#252525] border border-white/5 px-4 py-3 rounded-xl text-white outline-none focus:ring-2 focus:ring-orange-500 transition">
+                            </div>
+
+                            <!-- Reporte Técnico del Entrenador -->
+                            <div class="lg:col-span-3 border-b border-white/5 pb-4 mt-4 mb-2"><h4 class="text-purple-500 font-bold uppercase text-xs tracking-widest">3. Reporte Técnico / Evolución</h4></div>
+                            
+                            <div class="lg:col-span-3">
+                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Notas o Recomendaciones del Coach</label>
+                                <textarea id="pilotNotes" rows="3" placeholder="Ej: Mateo ha mejorado mucho su salida en el partidor. Debemos seguir trabajando la técnica de manual en la segunda recta..." class="w-full bg-[#252525] border border-white/5 px-4 py-3 rounded-xl text-white outline-none focus:ring-2 focus:ring-purple-500 transition resize-none"></textarea>
+                            </div>
+                            <div class="lg:col-span-1 md:col-span-2">
+                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Foto Evidencia (En tu GitHub)</label>
+                                <input type="text" id="pilotReportImage" placeholder="Ej: tecnica-salida.jpg" class="w-full bg-[#252525] border border-white/5 px-4 py-3 rounded-xl text-white outline-none focus:ring-2 focus:ring-purple-500 transition">
+                            </div>
+                            <div class="lg:col-span-2 md:col-span-2">
+                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Video de Evolución (YouTube)</label>
+                                <input type="text" id="pilotReportVideo" placeholder="Ej: https://youtube.com/watch?v=..." class="w-full bg-[#252525] border border-white/5 px-4 py-3 rounded-xl text-white outline-none focus:ring-2 focus:ring-purple-500 transition">
+                            </div>
+                        </div>
+
+                        <button type="submit" id="pilotSubmitBtn" class="w-full bg-orange-500 hover:bg-orange-600 transition py-5 rounded-2xl font-black uppercase italic shadow-2xl text-white flex justify-center items-center mt-8 text-lg tracking-widest">
+                            <span>GUARDAR CAMBIOS EN BASE DE DATOS</span>
+                        </button>
+                    </form>
+                </div>
+
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
                     <!-- Formulario de Noticias -->
                     <div class="bg-zinc-900 p-8 rounded-[3rem] border border-white/5 shadow-2xl">
-                        <h3 class="font-heading text-xl font-black text-white uppercase italic mb-8 border-b border-white/5 pb-4 tracking-widest">Publicar Noticia</h3>
+                        <h3 class="font-heading text-xl font-black text-white uppercase italic mb-8 border-b border-white/5 pb-4 tracking-widest">Publicar Noticia en Inicio</h3>
                         <form id="newsForm" class="space-y-5">
                             <input type="text" id="newsTitle" placeholder="Título de la publicación" required class="w-full bg-[#252525] border border-white/5 px-6 py-4 rounded-xl text-white outline-none focus:ring-2 focus:ring-purple-500 transition">
                             <textarea id="newsContent" placeholder="Describe lo que pasó..." rows="3" required class="w-full bg-[#252525] border border-white/5 px-6 py-4 rounded-xl text-white outline-none focus:ring-2 focus:ring-purple-500 transition"></textarea>
                             
-                            <!-- Uso de Links Gratuitos (GitHub/YouTube) -->
                             <div class="bg-black/30 p-4 rounded-xl border border-white/5">
-                                <label class="block text-[10px] font-black text-purple-500 uppercase tracking-widest mb-3">Nombre del archivo en GitHub (ej: foto.jpg) o Link YouTube</label>
+                                <label class="block text-[10px] font-black text-purple-500 uppercase tracking-widest mb-3">Archivo (GitHub) o YouTube</label>
                                 <input type="text" id="newsMediaUrl" placeholder="Ej: mifoto.jpg o https://youtube.com/watch..." class="w-full bg-[#252525] border border-white/5 px-4 py-3 rounded-lg text-white text-sm outline-none focus:border-purple-500 transition">
                             </div>
 
@@ -577,52 +675,6 @@
                         <h3 class="font-heading text-xl font-black text-white uppercase italic mb-8 border-b border-white/5 pb-4 tracking-widest">Nuevos Prospectos (Web)</h3>
                         <div id="leads-list" class="space-y-4 overflow-y-auto max-h-[500px] pr-2 text-sm italic text-gray-500">Cargando solicitudes...</div>
                     </div>
-                </div>
-
-                <!-- NUEVO: GESTOR DE PILOTOS (¡CREA A LOS NIÑOS DESDE AQUÍ!) -->
-                <div class="bg-zinc-900 p-8 rounded-[3rem] border border-white/5 shadow-2xl w-full max-w-4xl mx-auto">
-                    <h3 class="font-heading text-2xl font-black text-orange-500 uppercase italic mb-2 tracking-widest">Gestor de Pilotos</h3>
-                    <p class="text-gray-400 text-sm mb-8 italic border-b border-white/5 pb-4">Crea o actualiza la ficha de los niños sin entrar a Firebase.</p>
-                    
-                    <form id="pilotForm" class="space-y-6">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">ID Único del Piloto (El que usará para entrar)</label>
-                                <input type="text" id="pilotIdInput" placeholder="Ej: MATEO01" required class="w-full bg-[#252525] border border-white/5 px-4 py-3 rounded-xl text-white outline-none focus:ring-2 focus:ring-orange-500 transition">
-                            </div>
-                            <div>
-                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Nombre Completo</label>
-                                <input type="text" id="pilotName" placeholder="Ej: Mateo Rodríguez" required class="w-full bg-[#252525] border border-white/5 px-4 py-3 rounded-xl text-white outline-none focus:ring-2 focus:ring-orange-500 transition">
-                            </div>
-                            <div>
-                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Categoría</label>
-                                <input type="text" id="pilotLevel" placeholder="Ej: Iniciación, Élite..." required class="w-full bg-[#252525] border border-white/5 px-4 py-3 rounded-xl text-white outline-none focus:ring-2 focus:ring-orange-500 transition">
-                            </div>
-                            <div>
-                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Puntos del Club</label>
-                                <input type="number" id="pilotPoints" placeholder="Ej: 250" required class="w-full bg-[#252525] border border-white/5 px-4 py-3 rounded-xl text-white outline-none focus:ring-2 focus:ring-orange-500 transition">
-                            </div>
-                            <div>
-                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Edad</label>
-                                <input type="text" id="pilotAge" placeholder="Ej: 10 años" class="w-full bg-[#252525] border border-white/5 px-4 py-3 rounded-xl text-white outline-none focus:ring-2 focus:ring-orange-500 transition">
-                            </div>
-                            <div>
-                                <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Tipo de Sangre</label>
-                                <input type="text" id="pilotBlood" placeholder="Ej: O+" class="w-full bg-[#252525] border border-white/5 px-4 py-3 rounded-xl text-white outline-none focus:ring-2 focus:ring-orange-500 transition">
-                            </div>
-                            <div class="md:col-span-2">
-                                <label class="block text-[10px] font-black text-orange-500 uppercase tracking-widest mb-2">Link Foto de Perfil (o nombre de archivo en GitHub)</label>
-                                <input type="text" id="pilotPhoto" placeholder="Ej: mateo-perfil.jpg" class="w-full bg-[#252525] border border-white/5 px-4 py-3 rounded-xl text-white outline-none focus:ring-2 focus:ring-orange-500 transition">
-                            </div>
-                            <div class="md:col-span-2">
-                                <label class="block text-[10px] font-black text-purple-500 uppercase tracking-widest mb-2">Link de Video Destacado (YouTube)</label>
-                                <input type="text" id="pilotVideo" placeholder="Ej: https://youtube.com/watch?v=..." class="w-full bg-[#252525] border border-white/5 px-4 py-3 rounded-xl text-white outline-none focus:ring-2 focus:ring-purple-500 transition">
-                            </div>
-                        </div>
-                        <button type="submit" id="pilotSubmitBtn" class="w-full bg-orange-500 hover:bg-orange-600 transition py-4 rounded-xl font-black uppercase italic shadow-lg text-white flex justify-center items-center mt-4">
-                            <span>GUARDAR PILOTO EN BASE DE DATOS</span>
-                        </button>
-                    </form>
                 </div>
 
             </div>
@@ -658,9 +710,9 @@
                 currentAppId = typeof __app_id !== 'undefined' ? __app_id : 'vulcanobmx';
             } catch (e) {}
         } else {
-            // TUS LLAVES REALES
+            // TUS LLAVES REALES (LÍNEA 663 APROX)
             firebaseConfig = {
-                apiKey: "PON_TU_API_KEY_REAL_AQUI", // 👈 RECUERDA PEGAR TU LLAVE VERDADERA AQUÍ ANTES DE SUBIR A GITHUB
+                apiKey: "AIzaSyD2lj5XsTghDKNxa_RE-hk1sA8V174lk_E", // 👈 TU LLAVE REAL
                 authDomain: "vulcanobmx.firebaseapp.com",
                 projectId: "vulcanobmx",
                 storageBucket: "vulcanobmx.firebasestorage.app",
@@ -678,7 +730,6 @@
         };
         
         window.logout = () => {
-            // Reinicio completo de la página para cerrar sesiones con candado
             window.location.reload(); 
         };
         
@@ -776,15 +827,18 @@
                 const userDocRef = doc(db, 'artifacts', currentAppId, 'public', 'data', 'profiles', uid);
                 const snap = await getDoc(userDocRef);
                 
-                let data = { name: "Piloto Vulcano", level: "Iniciación", points: 0, age: "--", blood: "--", photoUrl: "", videoUrl: "" };
+                let data = { 
+                    name: "Piloto Vulcano", level: "Iniciación", points: 0, age: "--", blood: "--", 
+                    photoUrl: "", videoUrl: "",
+                    paymentStatus: "Al día", nextRace: "Copa Nariño BMX", nextRaceLocation: "Pasto, Nariño",
+                    coachNotes: "", reportPhoto: "", reportVideo: ""
+                };
                 
                 if (snap.exists()) {
-                    data = snap.data();
-                } else {
-                    // Si la ficha no existe, no la crea aquí, solo la muestra vacía para que el Coach la llene después.
+                    data = { ...data, ...snap.data() };
                 }
                 
-                // Actualizar UI
+                // Actualizar UI Básica
                 if(nameEl) nameEl.innerText = data.name || "Piloto Vulcano";
                 const levelEl = document.getElementById('profileLevel');
                 if(levelEl) levelEl.innerText = "Categoría: " + (data.level || "Iniciación");
@@ -810,18 +864,56 @@
                     if(ninjaIcon) ninjaIcon.classList.remove('hidden');
                 }
 
-                // Cargar Video Destacado
-                const videoContainer = document.getElementById('profileVideoContainer');
-                const videoIframe = document.getElementById('profileVideoIframe');
-                if (data.videoUrl && data.videoUrl.trim() !== "" && videoContainer) {
-                    videoContainer.classList.remove('hidden');
-                    let embedUrl = data.videoUrl;
-                    if (embedUrl.includes('watch?v=')) embedUrl = embedUrl.replace('watch?v=', 'embed/').split('&')[0];
-                    else if (embedUrl.includes('youtu.be/')) embedUrl = embedUrl.replace('youtu.be/', 'youtube.com/embed/');
-                    videoIframe.src = embedUrl;
-                } else if (videoContainer) {
-                    videoContainer.classList.add('hidden');
-                    videoIframe.src = '';
+                // Actualizar UI: Estado de Mensualidad y Competencia
+                const paymentEl = document.getElementById('profilePaymentStatus');
+                if (paymentEl) paymentEl.innerText = data.paymentStatus || "Al día";
+                const paymentDot = document.getElementById('paymentDot');
+                if (paymentDot) {
+                    paymentDot.className = data.paymentStatus === 'Pendiente' ? 'w-3 h-3 bg-red-500 rounded-full animate-pulse' : 'w-3 h-3 bg-green-500 rounded-full animate-pulse';
+                }
+
+                const raceEl = document.getElementById('profileNextRace');
+                if (raceEl) raceEl.innerText = data.nextRace || "Sin programar";
+                const raceLocEl = document.getElementById('profileNextRaceLocation');
+                if (raceLocEl) raceLocEl.innerText = data.nextRaceLocation || "--";
+
+                // Cargar Video Destacado del Perfil (Si existe)
+                /* Ojo: Lo dejamos oculto si no hay, o lo mostramos */
+                /* No confundir con el Video del Reporte del Coach */
+                /* En esta versión, vamos a usar el reporte del coach como área principal de multimedia */
+
+                // 🔴 NUEVO: Cargar Reporte Técnico del Coach
+                const reportContainer = document.getElementById('profileCoachReportContainer');
+                const notesEl = document.getElementById('profileCoachNotes');
+                const reportImg = document.getElementById('profileReportImage');
+                const reportVid = document.getElementById('profileReportVideo');
+
+                // ¿Tiene reporte? (Si hay notas, foto o video)
+                if ((data.coachNotes && data.coachNotes.trim() !== "") || (data.reportPhoto && data.reportPhoto.trim() !== "") || (data.reportVideo && data.reportVideo.trim() !== "")) {
+                    if(reportContainer) reportContainer.classList.remove('hidden');
+                    if(notesEl) notesEl.innerText = data.coachNotes || "";
+                    
+                    // Foto del reporte
+                    if (data.reportPhoto && data.reportPhoto.trim() !== "") {
+                        reportImg.src = data.reportPhoto;
+                        reportImg.classList.remove('hidden');
+                    } else {
+                        reportImg.classList.add('hidden');
+                    }
+
+                    // Video del reporte
+                    if (data.reportVideo && data.reportVideo.trim() !== "") {
+                        let embedUrl = data.reportVideo;
+                        if (embedUrl.includes('watch?v=')) embedUrl = embedUrl.replace('watch?v=', 'embed/').split('&')[0];
+                        else if (embedUrl.includes('youtu.be/')) embedUrl = embedUrl.replace('youtu.be/', 'youtube.com/embed/');
+                        reportVid.src = embedUrl;
+                        reportVid.classList.remove('hidden');
+                    } else {
+                        reportVid.classList.add('hidden');
+                    }
+                } else {
+                    // Si no hay reporte, ocultamos toda la sección
+                    if(reportContainer) reportContainer.classList.add('hidden');
                 }
 
             } catch (e) {
@@ -911,7 +1003,7 @@
                 }
             });
 
-            // 🔴 LÓGICA DE LOGIN ESTRICTA (SEPARACIÓN DE COACH Y PILOTO)
+            // LÓGICA DE LOGIN ESTRICTA (SEPARACIÓN DE COACH Y PILOTO)
             const loginForm = document.getElementById('portalLoginForm');
             if (loginForm) {
                 loginForm.addEventListener('submit', (e) => {
@@ -932,14 +1024,14 @@
                     document.getElementById('member-portal').classList.remove('hidden');
                     window.scrollTo(0, 0);
 
-                    // 1. CANDADO DE SEGURIDAD ESTRICTO: Por defecto todo lo de Coach se oculta
+                    // CANDADO DE SEGURIDAD ESTRICTO: Por defecto todo lo de Coach se oculta
                     const adminTabBtn = document.getElementById('admin-tab-btn');
                     if(adminTabBtn) adminTabBtn.style.display = 'none'; // Se oculta forzadamente
                     document.getElementById('tab-admin').classList.add('hidden');
                     document.getElementById('tab-profile').classList.remove('hidden');
                     document.getElementById('btn-profile').className = 'px-6 py-2 bg-orange-500 rounded-full text-xs font-black uppercase text-white transition shadow-lg';
 
-                    // 2. Si entra el Coach, se desbloquean sus herramientas
+                    // Si entra el Coach, se desbloquean sus herramientas
                     if (loginId === 'COACH' || loginId === 'ADMIN') {
                         if(adminTabBtn) adminTabBtn.style.display = 'inline-block'; // Se revela solo a él
                         
@@ -955,14 +1047,17 @@
                         const img = document.getElementById('profilePhotoImg');
                         if (img) img.classList.add('hidden');
                         
+                        // Ocultamos reportes en la vista del coach (porque él es coach)
                         const vc = document.getElementById('profileVideoContainer');
                         if (vc) vc.classList.add('hidden');
+                        const rc = document.getElementById('profileCoachReportContainer');
+                        if (rc) rc.classList.add('hidden');
 
                         // Activar y saltar directo al Panel Coach
                         checkAdmin();
                         window.switchTab('admin');
                     } else {
-                        // 3. Si entra un Piloto normal, el Panel de Coach se queda oculto
+                        // Si entra un Piloto normal, el Panel de Coach se queda oculto
                         setupProfile(loginId);
                     }
                 });
@@ -1004,7 +1099,7 @@
                 }
             });
 
-            // 🔴 FORMULARIO GESTOR DE PILOTOS (Guarda directamente sin restricciones extrañas)
+            // 🔴 FORMULARIO GESTOR DE PILOTOS (Guarda todos los datos nuevos)
             const pilotForm = document.getElementById('pilotForm');
             pilotForm?.addEventListener('submit', async (e) => {
                 e.preventDefault();
@@ -1019,15 +1114,24 @@
                     try {
                         const profileRef = doc(db, 'artifacts', currentAppId, 'public', 'data', 'profiles', pid);
                         await setDoc(profileRef, {
+                            // Basicos
                             name: document.getElementById('pilotName').value.trim(),
                             level: document.getElementById('pilotLevel').value.trim(),
                             points: Number(document.getElementById('pilotPoints').value) || 0,
                             age: document.getElementById('pilotAge').value.trim(),
                             blood: document.getElementById('pilotBlood').value.trim().toUpperCase(),
                             photoUrl: document.getElementById('pilotPhoto').value.trim(),
-                            videoUrl: document.getElementById('pilotVideo').value.trim(),
+                            // Estado / Competencia
+                            paymentStatus: document.getElementById('pilotPayment').value,
+                            nextRace: document.getElementById('pilotRace').value.trim(),
+                            nextRaceLocation: document.getElementById('pilotRaceLoc').value.trim(),
+                            // Reporte del Coach
+                            coachNotes: document.getElementById('pilotNotes').value.trim(),
+                            reportPhoto: document.getElementById('pilotReportImage').value.trim(),
+                            reportVideo: document.getElementById('pilotReportVideo').value.trim(),
+                            
                             updatedAt: new Date().toISOString()
-                        }, { merge: true }); // Mantiene los datos viejos si dejas un campo vacío
+                        }, { merge: true }); // merge: true evita borrar datos
                         
                         alert("¡Piloto " + pid + " guardado exitosamente en la base de datos!");
                         pilotForm.reset();
@@ -1036,7 +1140,7 @@
                         alert("Error al guardar el piloto: " + err.message);
                     }
                 } else {
-                    alert("Por favor verifica tu conexión a internet y asegúrate de escribir un ID de piloto.");
+                    alert("Por favor verifica tu conexión y asegúrate de escribir un ID de piloto.");
                 }
                 
                 btn.innerHTML = originalText;
