@@ -452,7 +452,11 @@
                         <div class="space-y-6">
                             <input type="text" id="leadName" placeholder="Nombre completo" required class="w-full bg-[#252525] border border-white/5 px-6 py-5 rounded-2xl text-white outline-none focus:ring-2 focus:ring-orange-500 transition">
                             <input type="tel" id="leadPhone" placeholder="Tu WhatsApp" required class="w-full bg-[#252525] border border-white/5 px-6 py-5 rounded-2xl text-white outline-none focus:ring-2 focus:ring-orange-500 transition">
+                            <!-- NUEVO: Campo de Correo Electrónico -->
+                            <input type="email" id="leadEmail" placeholder="Tu Correo Electrónico" required class="w-full bg-[#252525] border border-white/5 px-6 py-5 rounded-2xl text-white outline-none focus:ring-2 focus:ring-orange-500 transition">
                             <select id="leadLevel" class="w-full bg-[#252525] border border-white/5 px-6 py-5 rounded-2xl text-gray-400 outline-none focus:ring-2 focus:ring-orange-500 transition appearance-none cursor-pointer">
+                                <!-- NUEVO: Opción de solo consulta -->
+                                <option value="consulta">Solo Consulta / Información</option>
                                 <option value="iniciacion">Interés: Iniciación</option>
                                 <option value="competitivo">Interés: Competitivo</option>
                                 <option value="pro">Interés: Élite</option>
@@ -523,7 +527,7 @@
                 <div class="lg:col-span-3 space-y-8">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <!-- Mensualidad Dinámica -->
-                        <div class="bg-zinc-900 p-10 rounded-[3rem] border border-white/5 shadow-xl">
+                        <div id="monthlyStatusContainer" class="bg-zinc-900 p-10 rounded-[3rem] border border-white/5 shadow-xl">
                             <h5 class="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-4">Estado de Mensualidad</h5>
                             <div class="flex items-center gap-4">
                                 <div id="paymentDot" class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
@@ -531,7 +535,7 @@
                             </div>
                         </div>
                         <!-- Competencia Dinámica -->
-                        <div class="bg-zinc-900 p-10 rounded-[3rem] border border-white/5 shadow-xl">
+                        <div id="nextRaceContainer" class="bg-zinc-900 p-10 rounded-[3rem] border border-white/5 shadow-xl">
                             <h5 class="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-4">Próxima Competencia</h5>
                             <span id="profileNextRace" class="text-white text-xl font-black italic uppercase">Copa Nariño BMX</span>
                             <p id="profileNextRaceLocation" class="text-gray-500 text-xs mt-2 italic font-bold">Pasto, Nariño</p>
@@ -722,7 +726,7 @@
                 currentAppId = typeof __app_id !== 'undefined' ? __app_id : 'vulcanobmx';
             } catch (e) {}
         } else {
-            // TUS LLAVES REALES (LÍNEA 663 APROX)
+            // TUS LLAVES REALES (LÍNEA 669 APROX)
             firebaseConfig = {
                 apiKey: "AIzaSyD2lj5XsTghDKNxa_RE-hk1sA8V174lk_E", // 👈 TU LLAVE REAL
                 authDomain: "vulcanobmx.firebaseapp.com",
@@ -827,7 +831,7 @@
             });
         };
 
-        // --- CARGAR PERFIL DE DEPORTISTA ---
+        // --- CARGAR PERFIL DE DEPORTISTA O COACH ---
         const setupProfile = async (uid) => {
             if (!uid || !db) return;
             
@@ -839,15 +843,30 @@
                 const userDocRef = doc(db, 'artifacts', currentAppId, 'public', 'data', 'profiles', uid);
                 const snap = await getDoc(userDocRef);
                 
-                let data = { 
-                    name: "Piloto Vulcano", level: "Iniciación", points: 0, age: "--", blood: "--", 
-                    photoUrl: "", videoUrl: "",
-                    paymentStatus: "Al día", nextRace: "Copa Nariño BMX", nextRaceLocation: "Pasto, Nariño",
-                    coachNotes: "", reportPhoto: "", reportVideo: ""
-                };
+                let data;
+                // Si el ID es COACH, configuramos valores por defecto de Administrador
+                if (uid === 'COACH' || uid === 'ADMIN') {
+                    data = { name: "Coach Vulcano", level: "STAFF", points: "∞", age: "--", blood: "--", photoUrl: "", videoUrl: "" };
+                    // Ocultar tarjetas de Mensualidad y Competencia para el Coach
+                    document.getElementById('monthlyStatusContainer')?.classList.add('hidden');
+                    document.getElementById('nextRaceContainer')?.classList.add('hidden');
+                } else {
+                    data = { 
+                        name: "Piloto Vulcano", level: "Iniciación", points: 0, age: "--", blood: "--", 
+                        photoUrl: "", videoUrl: "",
+                        paymentStatus: "Al día", nextRace: "Copa Nariño BMX", nextRaceLocation: "Pasto, Nariño",
+                        coachNotes: "", reportPhoto: "", reportVideo: ""
+                    };
+                    // Asegurar que estén visibles para Pilotos normales
+                    document.getElementById('monthlyStatusContainer')?.classList.remove('hidden');
+                    document.getElementById('nextRaceContainer')?.classList.remove('hidden');
+                }
                 
                 if (snap.exists()) {
                     data = { ...data, ...snap.data() };
+                } else {
+                    if (auth && !auth.currentUser) await signInAnonymously(auth);
+                    await setDoc(userDocRef, { ...data, joined: new Date().toISOString() });
                 }
                 
                 // Actualizar UI Básica
@@ -876,18 +895,20 @@
                     if(ninjaIcon) ninjaIcon.classList.remove('hidden');
                 }
 
-                // Actualizar UI: Estado de Mensualidad y Competencia
-                const paymentEl = document.getElementById('profilePaymentStatus');
-                if (paymentEl) paymentEl.innerText = data.paymentStatus || "Al día";
-                const paymentDot = document.getElementById('paymentDot');
-                if (paymentDot) {
-                    paymentDot.className = data.paymentStatus === 'Pendiente' ? 'w-3 h-3 bg-red-500 rounded-full animate-pulse' : 'w-3 h-3 bg-green-500 rounded-full animate-pulse';
-                }
+                // Actualizar UI: Estado de Mensualidad y Competencia (Solo si no es Coach)
+                if (uid !== 'COACH' && uid !== 'ADMIN') {
+                    const paymentEl = document.getElementById('profilePaymentStatus');
+                    if (paymentEl) paymentEl.innerText = data.paymentStatus || "Al día";
+                    const paymentDot = document.getElementById('paymentDot');
+                    if (paymentDot) {
+                        paymentDot.className = data.paymentStatus === 'Pendiente' ? 'w-3 h-3 bg-red-500 rounded-full animate-pulse' : 'w-3 h-3 bg-green-500 rounded-full animate-pulse';
+                    }
 
-                const raceEl = document.getElementById('profileNextRace');
-                if (raceEl) raceEl.innerText = data.nextRace || "Sin programar";
-                const raceLocEl = document.getElementById('profileNextRaceLocation');
-                if (raceLocEl) raceLocEl.innerText = data.nextRaceLocation || "--";
+                    const raceEl = document.getElementById('profileNextRace');
+                    if (raceEl) raceEl.innerText = data.nextRace || "Sin programar";
+                    const raceLocEl = document.getElementById('profileNextRaceLocation');
+                    if (raceLocEl) raceLocEl.innerText = data.nextRaceLocation || "--";
+                }
 
                 // Cargar Reporte Técnico del Coach
                 const reportContainer = document.getElementById('profileCoachReportContainer');
@@ -942,13 +963,25 @@
                         const d = doc.data();
                         const item = document.createElement('div');
                         item.className = "bg-black/30 p-5 rounded-2xl border border-white/5 mb-3";
+                        
+                        // Parsear número de teléfono a solo dígitos para el enlace de WhatsApp
+                        let phoneNum = (d.phone || '').replace(/\D/g, '');
+                        if (phoneNum.length === 10) phoneNum = '57' + phoneNum; // Asume Colombia si tiene 10 dígitos
+
                         item.innerHTML = `
                             <div class="flex justify-between mb-2">
                                 <span class="text-orange-500 font-black text-xs uppercase">${d.name || 'Sin nombre'}</span>
                                 <span class="bg-purple-600/20 text-purple-400 px-2 py-0.5 rounded text-[8px] font-black">${d.level || '-'}</span>
                             </div>
-                            <div class="text-white text-sm font-bold"><i class="fab fa-whatsapp mr-2 text-green-500"></i>${d.phone || 'Sin teléfono'}</div>
-                            <div class="text-gray-500 text-[10px] mt-2 italic border-t border-white/5 pt-2">${d.notes || 'Sin preguntas adicionales.'}</div>
+                            <div class="text-gray-500 text-[10px] mt-2 italic border-t border-white/5 pt-2 mb-3">${d.notes || 'Sin preguntas adicionales.'}</div>
+                            <div class="flex gap-3">
+                                <a href="https://wa.me/${phoneNum}" target="_blank" class="bg-green-500/20 text-green-500 hover:bg-green-500 hover:text-white transition px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-2">
+                                    <i class="fab fa-whatsapp"></i> WhatsApp
+                                </a>
+                                ${d.email ? `<a href="mailto:${d.email}" class="bg-blue-500/20 text-blue-500 hover:bg-blue-500 hover:text-white transition px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-2">
+                                    <i class="fas fa-envelope"></i> Correo
+                                </a>` : ''}
+                            </div>
                         `;
                         list.appendChild(item);
                     });
@@ -988,6 +1021,7 @@
                         await addDoc(leadsRef, {
                             name: document.getElementById('leadName').value,
                             phone: document.getElementById('leadPhone').value,
+                            email: document.getElementById('leadEmail').value, // 🔴 NUEVO CORREO
                             level: document.getElementById('leadLevel').value,
                             notes: document.getElementById('leadNotes').value,
                             timestamp: new Date().toISOString()
@@ -1006,7 +1040,7 @@
                 }
             });
 
-            // 🔴 LÓGICA DE LOGIN ESTRICTA CON CONTRASEÑA 🔴
+            // LÓGICA DE LOGIN ESTRICTA CON CONTRASEÑA
             const loginForm = document.getElementById('portalLoginForm');
             if (loginForm) {
                 loginForm.addEventListener('submit', async (e) => {
@@ -1041,27 +1075,13 @@
                         document.getElementById('tab-profile').classList.remove('hidden');
                         document.getElementById('btn-profile').className = 'px-6 py-2 bg-orange-500 rounded-full text-xs font-black uppercase text-white transition shadow-lg';
 
-                        document.getElementById('profileName').innerText = "Coach Vulcano";
-                        document.getElementById('profileIdDisplay').innerText = "COACH";
-                        document.getElementById('profileLevel').innerText = "Categoría: STAFF";
-                        document.getElementById('profilePoints').innerText = "∞";
-                        document.getElementById('profileAge').innerText = "--";
-                        document.getElementById('profileBlood').innerText = "--";
-                        
-                        const ninja = document.getElementById('profileNinjaIcon');
-                        if (ninja) ninja.classList.remove('hidden');
-                        const img = document.getElementById('profilePhotoImg');
-                        if (img) img.classList.add('hidden');
-                        
-                        const vc = document.getElementById('profileVideoContainer');
-                        if (vc) vc.classList.add('hidden');
-                        const rc = document.getElementById('profileCoachReportContainer');
-                        if (rc) rc.classList.add('hidden');
-
+                        // 🔴 AHORA EL COACH TAMBIÉN USA LA FUNCIÓN DE PERFIL PARA PODER VER SU FOTO
                         checkAdmin();
                         window.switchTab('admin');
+                        setupProfile(loginId); 
+
                     } else {
-                        // 🔴 NUEVA VALIDACIÓN: Si entra un Piloto, comprobamos si existe y si su clave es correcta
+                        // Validación de Piloto
                         if (db) {
                             try {
                                 const userDocRef = doc(db, 'artifacts', currentAppId, 'public', 'data', 'profiles', loginId);
@@ -1071,7 +1091,7 @@
                                     const data = snap.data();
                                     const storedPass = data.password || ""; 
                                     
-                                    // Si el Coach le asignó contraseña, verificamos que coincida
+                                    // Verificamos contraseña
                                     if (storedPass !== "" && loginPass !== storedPass) {
                                         alert("Contraseña incorrecta. Intenta de nuevo.");
                                         submitBtn.innerHTML = originalBtnHtml;
@@ -1079,7 +1099,7 @@
                                         return;
                                     }
                                     
-                                    // Si la clave es correcta o el coach no le ha puesto clave aún, lo deja entrar
+                                    // Acceso Correcto
                                     window.currentLoginId = loginId;
                                     window.toggleModal('loginModal');
                                     document.getElementById('public-site').classList.add('hidden');
@@ -1145,7 +1165,7 @@
                 }
             });
 
-            // 🔴 NUEVA FUNCIÓN: Botón para Buscar Piloto Existente en el Gestor
+            // Botón para Buscar Piloto Existente en el Gestor
             const searchPilotBtn = document.getElementById('searchPilotBtn');
             searchPilotBtn?.addEventListener('click', async () => {
                 const pidInput = document.getElementById('pilotIdInput');
@@ -1197,7 +1217,7 @@
                 }
             });
 
-            // 🔴 FORMULARIO GESTOR DE PILOTOS (Guarda o Sobreescribe)
+            // FORMULARIO GESTOR DE PILOTOS (Guarda o Sobreescribe)
             const pilotForm = document.getElementById('pilotForm');
             pilotForm?.addEventListener('submit', async (e) => {
                 e.preventDefault();
@@ -1214,7 +1234,7 @@
                         await setDoc(profileRef, {
                             // Basicos y Acceso
                             name: document.getElementById('pilotName').value.trim(),
-                            password: document.getElementById('pilotPassword').value.trim(), // <--- Nueva Contraseña
+                            password: document.getElementById('pilotPassword').value.trim(),
                             level: document.getElementById('pilotLevel').value.trim(),
                             points: Number(document.getElementById('pilotPoints').value) || 0,
                             age: document.getElementById('pilotAge').value.trim(),
