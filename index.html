@@ -199,7 +199,6 @@
                     <a href="#coach" class="text-gray-300 hover:text-orange-500 px-2 py-2 font-bold tracking-widest text-xs transition uppercase text-shadow">Coach</a>
                     <a href="#horarios" class="text-gray-300 hover:text-orange-500 px-2 py-2 font-bold tracking-widest text-xs transition uppercase text-shadow">Horarios</a>
                     <a href="#ubicacion" class="text-gray-300 hover:text-orange-500 px-2 py-2 font-bold tracking-widest text-xs transition uppercase text-shadow">Sedes</a>
-                    <!-- Botón Únete -->
                     <a href="#contacto" class="btn-gradient text-white px-5 py-2 rounded-full font-black italic tracking-tighter transition shadow-lg uppercase text-[10px]"><span>Únete</span></a>
                     <button onclick="window.toggleModal('loginModal')" class="border border-white/20 hover:bg-orange-500 text-white px-5 py-2 rounded-full font-bold uppercase text-[10px] transition">Miembros</button>
                 </div>
@@ -220,7 +219,6 @@
                 <a href="#coach" class="text-gray-200 font-black tracking-widest uppercase text-2xl mobile-link">Coach</a>
                 <a href="#horarios" class="text-gray-200 font-black tracking-widest uppercase text-2xl mobile-link">Horarios</a>
                 <a href="#ubicacion" class="text-gray-200 font-black tracking-widest uppercase text-2xl mobile-link">Ubicaciones</a>
-                <!-- Únete en móvil -->
                 <a href="#contacto" class="text-orange-500 font-black tracking-widest uppercase text-2xl mobile-link">Únete ahora</a>
                 <button onclick="window.toggleModal('loginModal')" class="text-gray-200 font-black tracking-widest uppercase text-2xl mobile-link">Portal Miembros</button>
             </div>
@@ -589,24 +587,26 @@
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // CONFIGURACIÓN DE FIREBASE (Segura e Inteligente para evitar errores api-key-not-valid)
+        // Configuración Fija de Firebase 
         let firebaseConfig = {
             apiKey: "AIzaSyD2lj5XsTghDKNxa_RE-hk1sA8V174lk_E", 
             authDomain: "vulcanobmx.firebaseapp.com",
             projectId: "vulcanobmx",
             storageBucket: "vulcanobmx.firebasestorage.app",
             messagingSenderId: "196835151646",
-            appId: "1:196835151646:web:8962502338d42dc817830f",
-            measurementId: "G-LQRF132K8V"
+            appId: "1:196835151646:web:8962502338d42dc817830f"
         };
 
+        // Lógica de entorno seguro (solo la sobreescribe si el entorno de pruebas envía una llave válida)
         if (typeof __firebase_config !== 'undefined') {
             try {
                 const envConfig = JSON.parse(__firebase_config);
                 if (envConfig && envConfig.apiKey && envConfig.apiKey.length > 0) {
                     firebaseConfig = envConfig;
                 }
-            } catch (e) {}
+            } catch (e) {
+                console.warn("Usando configuración local en lugar de la del entorno de pruebas.");
+            }
         }
 
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'vulcanobmx';
@@ -636,6 +636,7 @@
                 auth = getAuth(app);
                 db = getFirestore(app);
 
+                // Inicio de sesión anónimo obligatorio para escribir en Firestore
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
                 } else {
@@ -651,6 +652,10 @@
                 });
             } catch (err) {
                 console.error("Error conectando con Firebase:", err);
+                const newsContainer = document.getElementById('news-container');
+                if (newsContainer) {
+                    newsContainer.innerHTML = '<div class="col-span-full text-center text-gray-600 py-10 italic">No se pudo conectar a la base de datos. Asegúrate de tener conexión.</div>';
+                }
             }
         };
 
@@ -765,7 +770,7 @@
                                 <span class="bg-purple-600/20 text-purple-400 px-2 py-0.5 rounded text-[8px] font-black">${d.level || '-'}</span>
                             </div>
                             <div class="text-white text-sm font-bold"><i class="fab fa-whatsapp mr-2 text-green-500"></i>${d.phone || 'Sin teléfono'}</div>
-                            <div class="text-gray-500 text-[10px] mt-2 italic border-t border-white/5 pt-2">${d.notes || 'Sin preguntas adicionales.'}</div>
+                            <div class="text-gray-500 text-[10px] mt-2 italic border-t border-white/5 pt-2">${d.notes || 'Sin notas.'}</div>
                         `;
                         list.appendChild(item);
                     });
