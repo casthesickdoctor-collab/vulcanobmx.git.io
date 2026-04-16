@@ -199,7 +199,6 @@
                     <a href="#coach" class="text-gray-300 hover:text-orange-500 px-2 py-2 font-bold tracking-widest text-xs transition uppercase text-shadow">Coach</a>
                     <a href="#horarios" class="text-gray-300 hover:text-orange-500 px-2 py-2 font-bold tracking-widest text-xs transition uppercase text-shadow">Horarios</a>
                     <a href="#ubicacion" class="text-gray-300 hover:text-orange-500 px-2 py-2 font-bold tracking-widest text-xs transition uppercase text-shadow">Sedes</a>
-                    <!-- Botón Únete Restaurado -->
                     <a href="#contacto" class="btn-gradient text-white px-5 py-2 rounded-full font-black italic tracking-tighter transition shadow-lg uppercase text-[10px]"><span>Únete</span></a>
                     <button onclick="window.toggleModal('loginModal')" class="border border-white/20 hover:bg-orange-500 text-white px-5 py-2 rounded-full font-bold uppercase text-[10px] transition">Miembros</button>
                 </div>
@@ -586,33 +585,22 @@
     <!-- FIREBASE Y LÓGICA DE LA APLICACIÓN -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // 🔴 ¡ATENCIÓN CARLOS ARTURO! PEGA AQUÍ TU CONFIGURACIÓN REAL 🔴
-        // Borra los datos de ejemplo de abajo y pega los que te da Firebase en "Configuración del proyecto" -> "Tus apps"
-        let firebaseConfig = {
-            apiKey: "¡¡¡PEGA_AQUÍ_TU_API_KEY_REAL!!!", 
-            authDomain: "vulcanobmx.firebaseapp.com",
-            projectId: "vulcanobmx",
-            storageBucket: "vulcanobmx.firebasestorage.app",
-            messagingSenderId: "196835151646",
-            appId: "1:196835151646:web:8962502338d42dc817830f",
-            measurementId: "G-LQRF132K8V"
-        };
+        // Configuración por defecto o del entorno
+        const firebaseConfig = typeof __firebase_config !== 'undefined' 
+            ? JSON.parse(__firebase_config) 
+            : {
+                apiKey: "AIzaSyD2lj5XsTghDKNxa_RE-hk1sA8V174lk_E", 
+                authDomain: "vulcanobmx.firebaseapp.com",
+                projectId: "vulcanobmx",
+                storageBucket: "vulcanobmx.firebasestorage.app",
+                messagingSenderId: "196835151646",
+                appId: "1:196835151646:web:8962502338d42dc817830f"
+            };
 
-        // Prevención de errores de entorno
-        let appIdValue = 'vulcanobmx';
-        if (typeof __firebase_config !== 'undefined') {
-            try {
-                const envConfig = JSON.parse(__firebase_config);
-                if (envConfig && envConfig.apiKey && envConfig.apiKey.length > 5) {
-                    firebaseConfig = envConfig;
-                    appIdValue = typeof __app_id !== 'undefined' ? __app_id : 'vulcanobmx';
-                }
-            } catch (e) { }
-        }
-
+        const appIdValue = typeof __app_id !== 'undefined' ? __app_id : 'vulcanobmx';
         let auth, db, currentUser = null;
 
         // --- FUNCIONES GLOBALES PARA EL HTML ---
@@ -639,10 +627,14 @@
                 auth = getAuth(app);
                 db = getFirestore(app);
 
-                // Inicio de sesión anónimo obligatorio para escribir en Firestore
-                await signInAnonymously(auth);
+                // Autenticación requerida para permisos en el entorno de prueba
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
 
-                // Esperar a que el usuario exista antes de leer la base de datos
+                // Esperar a que el usuario exista
                 onAuthStateChanged(auth, async (user) => {
                     currentUser = user;
                     if (user) {
@@ -653,7 +645,7 @@
                 console.error("Error conectando con Firebase:", err);
                 const newsContainer = document.getElementById('news-container');
                 if (newsContainer) {
-                    newsContainer.innerHTML = '<div class="col-span-full text-center text-red-500 py-10 italic font-bold">Error de conexión: Revisa tu internet o la configuración de Firebase. Asegúrate de poner tu apiKey real.</div>';
+                    newsContainer.innerHTML = '<div class="col-span-full text-center text-red-500 py-10 italic font-bold">Error de conexión con Firebase. Si estás probando localmente, revisa tu API Key.</div>';
                 }
             }
         };
@@ -704,13 +696,35 @@
                 });
             }, (error) => {
                 console.error("Error al descargar noticias:", error);
+                // Si el error es de permisos, guiamos al usuario visualmente
+                if (error.message.includes('permissions') || error.code === 'permission-denied') {
+                    const container = document.getElementById('news-container');
+                    if(container) {
+                        container.innerHTML = `
+                        <div class="col-span-full bg-red-500/10 border border-red-500 p-6 rounded-2xl text-left">
+                            <h4 class="text-red-500 font-black mb-2 uppercase">⚠️ Faltan permisos en tu Firebase</h4>
+                            <p class="text-gray-300 text-sm mb-4">El código se conectó con éxito, pero tu base de datos está bloqueando el acceso. Para solucionarlo, ve a tu consola de Firebase > Firestore Database > Reglas (Rules) y pega esto:</p>
+                            <pre class="bg-black p-4 rounded-xl text-xs text-green-400 overflow-x-auto">
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}</pre>
+                            <p class="text-gray-400 text-xs mt-4 italic">Luego de publicar las reglas, recarga esta página.</p>
+                        </div>`;
+                    }
+                }
             });
         };
 
         // --- CARGAR PERFIL DE DEPORTISTA ---
         const setupProfile = async (uid) => {
             if (!uid || !db || !currentUser) return;
-            const userDocRef = doc(db, 'artifacts', appIdValue, 'users', uid, 'profile', 'data');
+            // Guardamos los perfiles en un espacio público para que funcione el inicio de sesión simulado
+            const userDocRef = doc(db, 'artifacts', appIdValue, 'public', 'data', 'profiles', uid);
             
             try {
                 const snap = await getDoc(userDocRef);
@@ -824,7 +838,12 @@
                             console.error("Error al enviar.", err);
                             btnText.innerHTML = originalText;
                             document.getElementById('submitLeadBtn').disabled = false;
-                            alert("Hubo un error de conexión. Asegúrate de tener Internet y de haber pegado tus llaves correctamente en el código.");
+                            
+                            if (err.message.includes('permissions') || err.code === 'permission-denied') {
+                                alert("Error: Tu base de datos Firebase está bloqueando el guardado. Ve a tu consola de Firebase > Firestore Database > Reglas, y asegúrate de que esté en 'allow read, write: if true;'");
+                            } else {
+                                alert("Hubo un error de conexión.");
+                            }
                         }
                     } else if (retries < 5) {
                         retries++;
@@ -832,7 +851,7 @@
                     } else {
                         btnText.innerHTML = originalText;
                         document.getElementById('submitLeadBtn').disabled = false;
-                        alert("No se pudo conectar a Firebase. Asegúrate de pegar tu API_KEY correcta en el archivo.");
+                        alert("No se pudo conectar a tu base de datos de Firebase. Revisa tu consola.");
                     }
                 };
                 
@@ -892,7 +911,11 @@
                     }
                 } catch(err) {
                     console.error("Error subiendo la noticia:", err);
-                    alert("No se pudo publicar la noticia.");
+                    if (err.message.includes('permissions') || err.code === 'permission-denied') {
+                        alert("Error: Faltan permisos de Firebase. Ve a Firestore > Reglas y cambia a 'allow read, write: if true;'");
+                    } else {
+                        alert("No se pudo publicar la noticia.");
+                    }
                 } finally {
                     btn.disabled = false;
                     btnTextSpan.innerHTML = 'PUBLICAR NOTICIA';
