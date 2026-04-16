@@ -588,19 +588,32 @@
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Configuración por defecto o del entorno
-        const firebaseConfig = typeof __firebase_config !== 'undefined' 
-            ? JSON.parse(__firebase_config) 
-            : {
-                apiKey: "AIzaSyD2lj5XsTghDKNxa_RE-hK1sA8V174lk_E", 
+        // Variable global para detectar el entorno de Canvas
+        const isCanvasEnv = typeof __firebase_config !== 'undefined' && __firebase_config !== null;
+
+        // Configuración robusta que separa tu cuenta de la del entorno de pruebas
+        let firebaseConfig;
+        let currentAppId = 'vulcanobmx';
+
+        if (isCanvasEnv) {
+            try {
+                firebaseConfig = JSON.parse(__firebase_config);
+                currentAppId = typeof __app_id !== 'undefined' ? __app_id : 'vulcanobmx';
+            } catch (e) {
+                console.error("Error al leer entorno de pruebas.", e);
+            }
+        } else {
+            // AQUÍ VAN TUS LLAVES REALES (Usadas cuando abres el archivo en tu PC o GitHub)
+            firebaseConfig = {
+                apiKey: "AIzaSyD2lj5XsTghDKNxa_RE-hk1sA8V174lk_E", 
                 authDomain: "vulcanobmx.firebaseapp.com",
                 projectId: "vulcanobmx",
                 storageBucket: "vulcanobmx.firebasestorage.app",
                 messagingSenderId: "196835151646",
                 appId: "1:196835151646:web:8962502338d42dc817830f"
             };
+        }
 
-        const appIdValue = typeof __app_id !== 'undefined' ? __app_id : 'vulcanobmx';
         let auth, db, currentUser = null;
 
         // --- FUNCIONES GLOBALES PARA EL HTML ---
@@ -627,15 +640,15 @@
                 auth = getAuth(app);
                 db = getFirestore(app);
 
-                // Autenticación requerida para permisos en el entorno de prueba
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                // Inicio de sesión asegurado (obligatorio para escribir/leer)
+                if (isCanvasEnv && typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
                 } else {
                     await signInAnonymously(auth);
                 }
 
-                // Esperar a que el usuario exista
-                onAuthStateChanged(auth, async (user) => {
+                // Esperar a que Firebase confirme al usuario
+                onAuthStateChanged(auth, (user) => {
                     currentUser = user;
                     if (user) {
                         loadNews();
@@ -645,7 +658,7 @@
                 console.error("Error conectando con Firebase:", err);
                 const newsContainer = document.getElementById('news-container');
                 if (newsContainer) {
-                    newsContainer.innerHTML = '<div class="col-span-full text-center text-red-500 py-10 italic font-bold">Error de conexión con Firebase. Si estás probando localmente, revisa tu API Key.</div>';
+                    newsContainer.innerHTML = '<div class="col-span-full text-center text-red-500 py-10 italic font-bold">Error de conexión técnica. Verifica tu internet.</div>';
                 }
             }
         };
@@ -653,7 +666,7 @@
         // --- CARGA DE NOTICIAS ---
         const loadNews = () => {
             if (!db || !currentUser) return;
-            const q = collection(db, 'artifacts', appIdValue, 'public', 'data', 'news');
+            const q = collection(db, 'artifacts', currentAppId, 'public', 'data', 'news');
             
             onSnapshot(q, (snap) => {
                 const container = document.getElementById('news-container');
@@ -696,16 +709,23 @@
                 });
             }, (error) => {
                 console.error("Error al descargar noticias:", error);
-                // Si el error es de permisos, guiamos al usuario visualmente
+                // ESTA ALERTA APARECE SI LAS REGLAS DE TU FIREBASE ESTÁN CERRADAS
                 if (error.message.includes('permissions') || error.code === 'permission-denied') {
                     const container = document.getElementById('news-container');
                     if(container) {
                         container.innerHTML = `
-                        <div class="col-span-full bg-red-500/10 border border-red-500 p-6 rounded-2xl text-left">
-                            <h4 class="text-red-500 font-black mb-2 uppercase">⚠️ Faltan permisos en tu Firebase</h4>
-                            <p class="text-gray-300 text-sm mb-4">El código se conectó con éxito, pero tu base de datos está bloqueando el acceso. Para solucionarlo, ve a tu consola de Firebase > Firestore Database > Reglas (Rules) y pega esto:</p>
-                            <pre class="bg-black p-4 rounded-xl text-xs text-green-400 overflow-x-auto">
-rules_version = '2';
+                        <div class="col-span-full bg-red-500/10 border border-red-500 p-8 rounded-3xl text-left shadow-2xl">
+                            <h4 class="text-red-500 font-black text-xl mb-4 uppercase flex items-center gap-3">
+                                <i class="fas fa-lock"></i> Base de datos protegida
+                            </h4>
+                            <p class="text-gray-300 text-sm mb-4">El código se conectó con éxito a tu base de datos (por eso ves este mensaje), pero tu Firebase está rechazando la lectura por seguridad.</p>
+                            <p class="text-white text-sm font-bold mb-4">Para solucionarlo, sigue estos 3 pasos en tu consola de Firebase:</p>
+                            <ol class="text-gray-400 text-sm list-decimal list-inside space-y-2 mb-6">
+                                <li>Ve a <b>Firestore Database</b> en el menú izquierdo de tu consola de Firebase.</li>
+                                <li>Haz clic en la pestaña <b>Reglas (Rules)</b> ubicada arriba al centro.</li>
+                                <li>Borra todo el texto que haya allí y pega exactamente este código:</li>
+                            </ol>
+                            <pre class="bg-black p-4 rounded-xl text-xs text-green-400 overflow-x-auto border border-white/10">rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     match /{document=**} {
@@ -713,7 +733,7 @@ service cloud.firestore {
     }
   }
 }</pre>
-                            <p class="text-gray-400 text-xs mt-4 italic">Luego de publicar las reglas, recarga esta página.</p>
+                            <p class="text-gray-400 text-xs mt-6 italic">Por último, haz clic en el botón "Publicar" en Firebase y recarga esta página web. ¡El error desaparecerá!</p>
                         </div>`;
                     }
                 }
@@ -723,8 +743,7 @@ service cloud.firestore {
         // --- CARGAR PERFIL DE DEPORTISTA ---
         const setupProfile = async (uid) => {
             if (!uid || !db || !currentUser) return;
-            // Guardamos los perfiles en un espacio público para que funcione el inicio de sesión simulado
-            const userDocRef = doc(db, 'artifacts', appIdValue, 'public', 'data', 'profiles', uid);
+            const userDocRef = doc(db, 'artifacts', currentAppId, 'public', 'data', 'profiles', uid);
             
             try {
                 const snap = await getDoc(userDocRef);
@@ -733,7 +752,7 @@ service cloud.firestore {
                 if (snap.exists()) {
                     data = snap.data();
                 } else {
-                    await setDoc(userDocRef, { ...data, joined: new Date() });
+                    await setDoc(userDocRef, { ...data, joined: new Date().toISOString() });
                 }
                 
                 if(document.getElementById('profileName')) document.getElementById('profileName').innerText = data.name || "Piloto Vulcano";
@@ -763,7 +782,7 @@ service cloud.firestore {
                 const adminBtn = document.getElementById('admin-tab-btn');
                 if(adminBtn) adminBtn.classList.remove('hidden');
                 
-                onSnapshot(collection(db, 'artifacts', appIdValue, 'public', 'data', 'leads'), (snap) => {
+                onSnapshot(collection(db, 'artifacts', currentAppId, 'public', 'data', 'leads'), (snap) => {
                     const list = document.getElementById('leads-list');
                     if (!list) return;
                     list.innerHTML = '';
@@ -824,13 +843,13 @@ service cloud.firestore {
                 const attemptSend = async () => {
                     if (db && currentUser) {
                         try {
-                            const leadsRef = collection(db, 'artifacts', appIdValue, 'public', 'data', 'leads');
+                            const leadsRef = collection(db, 'artifacts', currentAppId, 'public', 'data', 'leads');
                             await addDoc(leadsRef, {
                                 name: document.getElementById('leadName').value,
                                 phone: document.getElementById('leadPhone').value,
                                 level: document.getElementById('leadLevel').value,
                                 notes: document.getElementById('leadNotes').value,
-                                timestamp: new Date()
+                                timestamp: new Date().toISOString()
                             });
                             contactForm.classList.add('hidden');
                             document.getElementById('formStatus').classList.remove('hidden');
@@ -839,8 +858,8 @@ service cloud.firestore {
                             btnText.innerHTML = originalText;
                             document.getElementById('submitLeadBtn').disabled = false;
                             
-                            if (err.message.includes('permissions') || err.code === 'permission-denied') {
-                                alert("Error: Tu base de datos Firebase está bloqueando el guardado. Ve a tu consola de Firebase > Firestore Database > Reglas, y asegúrate de que esté en 'allow read, write: if true;'");
+                            if (err.message && (err.message.includes('permissions') || err.code === 'permission-denied')) {
+                                alert("Éxito técnico pero rechazo de seguridad: Tu base de datos Firebase está bloqueando el guardado. Ve a tu consola de Firebase > Firestore Database > Reglas, y asegúrate de que esté en 'allow read, write: if true;'");
                             } else {
                                 alert("Hubo un error de conexión.");
                             }
@@ -851,7 +870,7 @@ service cloud.firestore {
                     } else {
                         btnText.innerHTML = originalText;
                         document.getElementById('submitLeadBtn').disabled = false;
-                        alert("No se pudo conectar a tu base de datos de Firebase. Revisa tu consola.");
+                        alert("No se pudo conectar a tu base de datos de Firebase.");
                     }
                 };
                 
@@ -896,12 +915,12 @@ service cloud.firestore {
 
                 try {
                     if (db && currentUser) {
-                        await addDoc(collection(db, 'artifacts', appIdValue, 'public', 'data', 'news'), {
+                        await addDoc(collection(db, 'artifacts', currentAppId, 'public', 'data', 'news'), {
                             title: title,
                             content: content,
                             mediaUrl: mediaUrl,
                             mediaType: mediaType,
-                            timestamp: new Date()
+                            timestamp: new Date().toISOString()
                         });
                         
                         e.target.reset();
@@ -911,7 +930,7 @@ service cloud.firestore {
                     }
                 } catch(err) {
                     console.error("Error subiendo la noticia:", err);
-                    if (err.message.includes('permissions') || err.code === 'permission-denied') {
+                    if (err.message && (err.message.includes('permissions') || err.code === 'permission-denied')) {
                         alert("Error: Faltan permisos de Firebase. Ve a Firestore > Reglas y cambia a 'allow read, write: if true;'");
                     } else {
                         alert("No se pudo publicar la noticia.");
