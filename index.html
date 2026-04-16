@@ -219,7 +219,6 @@
                 <a href="#coach" class="text-gray-200 font-black tracking-widest uppercase text-2xl mobile-link">Coach</a>
                 <a href="#horarios" class="text-gray-200 font-black tracking-widest uppercase text-2xl mobile-link">Horarios</a>
                 <a href="#ubicacion" class="text-gray-200 font-black tracking-widest uppercase text-2xl mobile-link">Ubicaciones</a>
-                <!-- Únete en móvil -->
                 <a href="#contacto" class="text-orange-500 font-black tracking-widest uppercase text-2xl mobile-link">Únete ahora</a>
                 <button onclick="window.toggleModal('loginModal')" class="text-gray-200 font-black tracking-widest uppercase text-2xl mobile-link">Portal Miembros</button>
             </div>
@@ -237,7 +236,7 @@
                 <h3 class="font-heading text-2xl font-bold italic uppercase text-gradient">Portal de Pilotos</h3>
             </div>
             <form id="portalLoginForm" class="space-y-4">
-                <input type="text" id="loginId" placeholder="ID Piloto (Admin: COACH)" required class="w-full bg-zinc-800 border border-white/5 px-6 py-4 rounded-xl text-white outline-none focus:border-orange-500 transition">
+                <input type="text" id="loginId" placeholder="ID Piloto (Coach usa: COACH)" required class="w-full bg-zinc-800 border border-white/5 px-6 py-4 rounded-xl text-white outline-none focus:border-orange-500 transition">
                 <input type="password" id="loginPass" placeholder="Contraseña" required class="w-full bg-zinc-800 border border-white/5 px-6 py-4 rounded-xl text-white outline-none focus:border-orange-500 transition">
                 <button type="submit" class="w-full btn-gradient py-4 rounded-xl font-black text-lg italic uppercase shadow-xl text-white"><span>Ingresar</span></button>
             </form>
@@ -575,9 +574,12 @@
     <footer id="main-footer" class="py-16 border-t border-white/5 bg-black text-center">
         <img src="logo vulcano.png" alt="Logo" class="h-10 opacity-30 mx-auto mb-6 grayscale">
         <div class="flex justify-center gap-8 mb-8 text-gray-500 text-2xl">
-            <a href="#" class="hover:text-orange-500 transition"><i class="fab fa-instagram"></i></a>
-            <a href="#" class="hover:text-orange-500 transition"><i class="fab fa-facebook-f"></i></a>
-            <a href="#" class="hover:text-orange-500 transition"><i class="fab fa-youtube"></i></a>
+            <!-- REEMPLAZA EL "#" POR EL LINK DE TU INSTAGRAM -->
+            <a href="#" target="_blank" class="hover:text-orange-500 transition"><i class="fab fa-instagram"></i></a>
+            <!-- REEMPLAZA EL "#" POR EL LINK DE TU FACEBOOK -->
+            <a href="#" target="_blank" class="hover:text-orange-500 transition"><i class="fab fa-facebook-f"></i></a>
+            <!-- REEMPLAZA EL "#" POR EL LINK DE TU YOUTUBE -->
+            <a href="#" target="_blank" class="hover:text-orange-500 transition"><i class="fab fa-youtube"></i></a>
         </div>
         <p class="text-gray-600 text-[10px] font-black uppercase tracking-[0.4em]">© 2024 VULCANO BMX NARIÑO • DISCIPLINA • RESPETO</p>
     </footer>
@@ -588,10 +590,9 @@
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Variable global para detectar el entorno de Canvas
+        // Variable global para detectar si estás en la ventana de prueba
         const isCanvasEnv = typeof __firebase_config !== 'undefined' && __firebase_config !== null;
 
-        // Configuración robusta que separa tu cuenta de la del entorno de pruebas
         let firebaseConfig;
         let currentAppId = 'vulcanobmx';
 
@@ -599,13 +600,11 @@
             try {
                 firebaseConfig = JSON.parse(__firebase_config);
                 currentAppId = typeof __app_id !== 'undefined' ? __app_id : 'vulcanobmx';
-            } catch (e) {
-                console.error("Error al leer entorno de pruebas.", e);
-            }
+            } catch (e) {}
         } else {
-            // AQUÍ VAN TUS LLAVES REALES (Usadas cuando abres el archivo en tu PC o GitHub)
+            // AQUÍ VAN TUS LLAVES REALES
             firebaseConfig = {
-                apiKey: "AIzaSyD2lj5XsTghDKNxa_RE-hk1sA8V174lk_E", 
+                apiKey: "AIzaSyD2lj5XsTghDKNxa_RE-hK1sA8V174lk_E", // 👈 REEMPLAZA ESTO
                 authDomain: "vulcanobmx.firebaseapp.com",
                 projectId: "vulcanobmx",
                 storageBucket: "vulcanobmx.firebasestorage.app",
@@ -640,14 +639,12 @@
                 auth = getAuth(app);
                 db = getFirestore(app);
 
-                // Inicio de sesión asegurado (obligatorio para escribir/leer)
                 if (isCanvasEnv && typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
                 } else {
                     await signInAnonymously(auth);
                 }
 
-                // Esperar a que Firebase confirme al usuario
                 onAuthStateChanged(auth, (user) => {
                     currentUser = user;
                     if (user) {
@@ -655,11 +652,7 @@
                     }
                 });
             } catch (err) {
-                console.error("Error conectando con Firebase:", err);
-                const newsContainer = document.getElementById('news-container');
-                if (newsContainer) {
-                    newsContainer.innerHTML = '<div class="col-span-full text-center text-red-500 py-10 italic font-bold">Error de conexión técnica. Verifica tu internet.</div>';
-                }
+                console.error("Error Firebase:", err);
             }
         };
 
@@ -709,79 +702,68 @@
                 });
             }, (error) => {
                 console.error("Error al descargar noticias:", error);
-                // ESTA ALERTA APARECE SI LAS REGLAS DE TU FIREBASE ESTÁN CERRADAS
-                if (error.message.includes('permissions') || error.code === 'permission-denied') {
-                    const container = document.getElementById('news-container');
-                    if(container) {
-                        container.innerHTML = `
-                        <div class="col-span-full bg-red-500/10 border border-red-500 p-8 rounded-3xl text-left shadow-2xl">
-                            <h4 class="text-red-500 font-black text-xl mb-4 uppercase flex items-center gap-3">
-                                <i class="fas fa-lock"></i> Base de datos protegida
-                            </h4>
-                            <p class="text-gray-300 text-sm mb-4">El código se conectó con éxito a tu base de datos (por eso ves este mensaje), pero tu Firebase está rechazando la lectura por seguridad.</p>
-                            <p class="text-white text-sm font-bold mb-4">Para solucionarlo, sigue estos 3 pasos en tu consola de Firebase:</p>
-                            <ol class="text-gray-400 text-sm list-decimal list-inside space-y-2 mb-6">
-                                <li>Ve a <b>Firestore Database</b> en el menú izquierdo de tu consola de Firebase.</li>
-                                <li>Haz clic en la pestaña <b>Reglas (Rules)</b> ubicada arriba al centro.</li>
-                                <li>Borra todo el texto que haya allí y pega exactamente este código:</li>
-                            </ol>
-                            <pre class="bg-black p-4 rounded-xl text-xs text-green-400 overflow-x-auto border border-white/10">rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if true;
-    }
-  }
-}</pre>
-                            <p class="text-gray-400 text-xs mt-6 italic">Por último, haz clic en el botón "Publicar" en Firebase y recarga esta página web. ¡El error desaparecerá!</p>
-                        </div>`;
-                    }
-                }
             });
         };
 
         // --- CARGAR PERFIL DE DEPORTISTA ---
         const setupProfile = async (uid) => {
-            if (!uid || !db || !currentUser) return;
-            const userDocRef = doc(db, 'artifacts', currentAppId, 'public', 'data', 'profiles', uid);
+            if (!uid || !db) return;
+            
+            const nameEl = document.getElementById('profileName');
+            if(nameEl) nameEl.innerText = "Sincronizando datos...";
+            document.getElementById('profileIdDisplay').innerText = uid.toUpperCase();
             
             try {
+                const userDocRef = doc(db, 'artifacts', currentAppId, 'public', 'data', 'profiles', uid);
                 const snap = await getDoc(userDocRef);
-                let data = { name: "Piloto Vulcano", level: "Iniciación", points: 0, age: "--", blood: "--", photoUrl: "" };
+                
+                let data = { name: "Piloto Vulcano", level: "Iniciación", points: 250, age: "--", blood: "--", photoUrl: "" };
                 
                 if (snap.exists()) {
                     data = snap.data();
                 } else {
+                    // Si el perfil no existe, lo crea automáticamente para que tú luego lo edites en Firebase
+                    if (!auth.currentUser) await signInAnonymously(auth);
                     await setDoc(userDocRef, { ...data, joined: new Date().toISOString() });
                 }
                 
-                if(document.getElementById('profileName')) document.getElementById('profileName').innerText = data.name || "Piloto Vulcano";
-                if(document.getElementById('profileLevel')) document.getElementById('profileLevel').innerText = "Categoría: " + (data.level || "Iniciación");
-                if(document.getElementById('profileIdDisplay')) document.getElementById('profileIdDisplay').innerText = uid;
-                if(document.getElementById('profilePoints')) document.getElementById('profilePoints').innerText = data.points || 0;
-                if(document.getElementById('profileAge')) document.getElementById('profileAge').innerText = data.age || "--";
-                if(document.getElementById('profileBlood')) document.getElementById('profileBlood').innerText = data.blood || "--";
+                // Actualizar Textos
+                if(nameEl) nameEl.innerText = data.name || "Piloto Vulcano";
+                const levelEl = document.getElementById('profileLevel');
+                if(levelEl) levelEl.innerText = "Categoría: " + (data.level || "Iniciación");
+                
+                const pointsEl = document.getElementById('profilePoints');
+                if(pointsEl) pointsEl.innerText = data.points !== undefined ? data.points : 0;
+                
+                const ageEl = document.getElementById('profileAge');
+                if(ageEl) ageEl.innerText = data.age || "--";
+                
+                const bloodEl = document.getElementById('profileBlood');
+                if(bloodEl) bloodEl.innerText = data.blood || "--";
                 
                 const photoImg = document.getElementById('profilePhotoImg');
                 const ninjaIcon = document.getElementById('profileNinjaIcon');
                 
-                if (data.photoUrl && photoImg) {
+                if (data.photoUrl && data.photoUrl.trim() !== "" && photoImg) {
                     photoImg.src = data.photoUrl;
                     photoImg.classList.remove('hidden');
                     if(ninjaIcon) ninjaIcon.classList.add('hidden');
+                } else {
+                    if(photoImg) photoImg.classList.add('hidden');
+                    if(ninjaIcon) ninjaIcon.classList.remove('hidden');
                 }
             } catch (e) {
-                console.error("Error cargando el perfil del deportista.", e);
+                console.error("Error cargando el perfil:", e);
+                if(nameEl) nameEl.innerText = "Piloto Vulcano";
             }
         };
 
         // --- PANEL DE ADMINISTRACIÓN (COACH) ---
         const checkAdmin = () => {
-            const inputId = window.currentLoginId || "";
-            if (db && currentUser && inputId.toUpperCase().includes("COACH")) {
-                const adminBtn = document.getElementById('admin-tab-btn');
-                if(adminBtn) adminBtn.classList.remove('hidden');
-                
+            const adminBtn = document.getElementById('admin-tab-btn');
+            if(adminBtn) adminBtn.classList.remove('hidden');
+            
+            if (db) {
                 onSnapshot(collection(db, 'artifacts', currentAppId, 'public', 'data', 'leads'), (snap) => {
                     const list = document.getElementById('leads-list');
                     if (!list) return;
@@ -806,8 +788,6 @@ service cloud.firestore {
                         `;
                         list.appendChild(item);
                     });
-                }, (error) => {
-                    console.error("Error al descargar leads:", error);
                 });
             }
         };
@@ -831,70 +811,67 @@ service cloud.firestore {
 
             // Formulario Público: Únete
             const contactForm = document.getElementById('contactForm');
-            contactForm?.addEventListener('submit', (e) => {
+            contactForm?.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const btnText = document.getElementById('submitLeadText');
-                
                 const originalText = btnText.innerHTML;
                 btnText.innerHTML = '<div class="loader"></div> PROCESANDO...';
                 document.getElementById('submitLeadBtn').disabled = true;
 
-                let retries = 0;
-                const attemptSend = async () => {
-                    if (db && currentUser) {
-                        try {
-                            const leadsRef = collection(db, 'artifacts', currentAppId, 'public', 'data', 'leads');
-                            await addDoc(leadsRef, {
-                                name: document.getElementById('leadName').value,
-                                phone: document.getElementById('leadPhone').value,
-                                level: document.getElementById('leadLevel').value,
-                                notes: document.getElementById('leadNotes').value,
-                                timestamp: new Date().toISOString()
-                            });
-                            contactForm.classList.add('hidden');
-                            document.getElementById('formStatus').classList.remove('hidden');
-                        } catch(err) {
-                            console.error("Error al enviar.", err);
-                            btnText.innerHTML = originalText;
-                            document.getElementById('submitLeadBtn').disabled = false;
-                            
-                            if (err.message && (err.message.includes('permissions') || err.code === 'permission-denied')) {
-                                alert("Éxito técnico pero rechazo de seguridad: Tu base de datos Firebase está bloqueando el guardado. Ve a tu consola de Firebase > Firestore Database > Reglas, y asegúrate de que esté en 'allow read, write: if true;'");
-                            } else {
-                                alert("Hubo un error de conexión.");
-                            }
-                        }
-                    } else if (retries < 5) {
-                        retries++;
-                        setTimeout(attemptSend, 1000);
-                    } else {
+                if (db && currentUser) {
+                    try {
+                        const leadsRef = collection(db, 'artifacts', currentAppId, 'public', 'data', 'leads');
+                        await addDoc(leadsRef, {
+                            name: document.getElementById('leadName').value,
+                            phone: document.getElementById('leadPhone').value,
+                            level: document.getElementById('leadLevel').value,
+                            notes: document.getElementById('leadNotes').value,
+                            timestamp: new Date().toISOString()
+                        });
+                        contactForm.classList.add('hidden');
+                        document.getElementById('formStatus').classList.remove('hidden');
+                    } catch(err) {
                         btnText.innerHTML = originalText;
                         document.getElementById('submitLeadBtn').disabled = false;
-                        alert("No se pudo conectar a tu base de datos de Firebase.");
+                        alert("Error de permisos. Asegúrate de haber actualizado tus reglas en Firebase.");
                     }
-                };
-                
-                attemptSend();
+                } else {
+                    btnText.innerHTML = originalText;
+                    document.getElementById('submitLeadBtn').disabled = false;
+                    alert("Aún conectando a Firebase, intenta de nuevo en unos segundos.");
+                }
             });
 
             // Formulario Login Portal
             const loginForm = document.getElementById('portalLoginForm');
             loginForm?.addEventListener('submit', (e) => {
                 e.preventDefault();
-                const loginId = document.getElementById('loginId').value.trim();
-                
+                const loginId = document.getElementById('loginId').value.trim().toUpperCase();
+                if (!loginId) return;
+
                 window.currentLoginId = loginId;
                 
+                // Mostrar portal y ocultar lo demás
                 window.toggleModal('loginModal');
                 document.getElementById('public-site').classList.add('hidden');
                 document.getElementById('main-nav').classList.add('hidden');
                 document.getElementById('member-portal').classList.remove('hidden');
                 window.scrollTo(0, 0);
 
-                if (!loginId.toUpperCase().includes('COACH')) {
-                    setupProfile(loginId);
-                } else {
+                // Forzar el bloqueo del panel del coach (candado de seguridad)
+                document.getElementById('admin-tab-btn').classList.add('hidden');
+                document.getElementById('tab-admin').classList.add('hidden');
+                document.getElementById('tab-profile').classList.remove('hidden');
+                document.getElementById('btn-profile').className = 'px-6 py-2 bg-orange-500 rounded-full text-xs font-black uppercase text-white transition shadow-lg';
+
+                if (loginId === 'COACH' || loginId === 'ADMIN') {
+                    document.getElementById('profileName').innerText = "Coach Vulcano";
+                    document.getElementById('profileIdDisplay').innerText = "COACH";
+                    document.getElementById('profileLevel').innerText = "Categoría: STAFF";
+                    document.getElementById('profilePoints').innerText = "∞";
                     checkAdmin();
+                } else {
+                    setupProfile(loginId);
                 }
             });
 
@@ -925,16 +902,9 @@ service cloud.firestore {
                         
                         e.target.reset();
                         alert("¡Noticia publicada con éxito! Revisa la página principal.");
-                    } else {
-                        alert("Error de conexión. Intenta de nuevo en unos segundos.");
                     }
                 } catch(err) {
-                    console.error("Error subiendo la noticia:", err);
-                    if (err.message && (err.message.includes('permissions') || err.code === 'permission-denied')) {
-                        alert("Error: Faltan permisos de Firebase. Ve a Firestore > Reglas y cambia a 'allow read, write: if true;'");
-                    } else {
-                        alert("No se pudo publicar la noticia.");
-                    }
+                    alert("Error publicando la noticia.");
                 } finally {
                     btn.disabled = false;
                     btnTextSpan.innerHTML = 'PUBLICAR NOTICIA';
