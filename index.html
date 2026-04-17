@@ -238,7 +238,6 @@
             </div>
             <form id="portalLoginForm" class="space-y-4">
                 <input type="text" id="loginId" placeholder="ID Piloto (Coach usa: COACH)" required class="w-full bg-zinc-800 border border-white/5 px-6 py-4 rounded-xl text-white outline-none focus:border-orange-500 transition">
-                <!-- Se requiere contraseña para Pilotos -->
                 <input type="password" id="loginPass" placeholder="Contraseña" required class="w-full bg-zinc-800 border border-white/5 px-6 py-4 rounded-xl text-white outline-none focus:border-orange-500 transition">
                 <button type="submit" class="w-full btn-gradient py-4 rounded-xl font-black text-lg italic uppercase shadow-xl text-white"><span>Ingresar</span></button>
             </form>
@@ -452,10 +451,8 @@
                         <div class="space-y-6">
                             <input type="text" id="leadName" placeholder="Nombre completo" required class="w-full bg-[#252525] border border-white/5 px-6 py-5 rounded-2xl text-white outline-none focus:ring-2 focus:ring-orange-500 transition">
                             <input type="tel" id="leadPhone" placeholder="Tu WhatsApp" required class="w-full bg-[#252525] border border-white/5 px-6 py-5 rounded-2xl text-white outline-none focus:ring-2 focus:ring-orange-500 transition">
-                            <!-- NUEVO: Campo de Correo Electrónico -->
                             <input type="email" id="leadEmail" placeholder="Tu Correo Electrónico" required class="w-full bg-[#252525] border border-white/5 px-6 py-5 rounded-2xl text-white outline-none focus:ring-2 focus:ring-orange-500 transition">
                             <select id="leadLevel" class="w-full bg-[#252525] border border-white/5 px-6 py-5 rounded-2xl text-gray-400 outline-none focus:ring-2 focus:ring-orange-500 transition appearance-none cursor-pointer">
-                                <!-- NUEVO: Opción de solo consulta -->
                                 <option value="consulta">Solo Consulta / Información</option>
                                 <option value="iniciacion">Interés: Iniciación</option>
                                 <option value="competitivo">Interés: Competitivo</option>
@@ -569,7 +566,7 @@
             <!-- Pestaña 2: Administración -->
             <div id="tab-admin" class="hidden text-left space-y-8">
                 
-                <!-- GESTOR DE PILOTOS (AHORA CON BÚSQUEDA Y CONTRASEÑAS) -->
+                <!-- GESTOR DE PILOTOS (BÚSQUEDA Y CONTRASEÑAS) -->
                 <div class="bg-zinc-900 p-8 rounded-[3rem] border border-orange-500/20 shadow-2xl w-full">
                     <h3 class="font-heading text-2xl font-black text-orange-500 uppercase italic mb-2 tracking-widest">Gestor Maestro de Pilotos</h3>
                     <p class="text-gray-400 text-sm mb-8 italic border-b border-white/5 pb-4">Crea nuevos pilotos o busca uno existente para actualizar sus datos y asignar su contraseña de ingreso.</p>
@@ -714,7 +711,6 @@
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Variable global para detectar si estás en la ventana de prueba
         const isCanvasEnv = typeof __firebase_config !== 'undefined' && __firebase_config !== null;
 
         let firebaseConfig;
@@ -726,9 +722,9 @@
                 currentAppId = typeof __app_id !== 'undefined' ? __app_id : 'vulcanobmx';
             } catch (e) {}
         } else {
-            // TUS LLAVES REALES (LÍNEA 669 APROX)
+            // TUS LLAVES REALES
             firebaseConfig = {
-                apiKey: "AIzaSyD2lj5XsTghDKNxa_RE-hk1sA8V174lk_E", // 👈 TU LLAVE REAL
+                apiKey: "AIzaSyD2lj5XsTghDKNxa_RE-hK1sA8V174lk_E", // 👈 TU LLAVE REAL AQUÍ
                 authDomain: "vulcanobmx.firebaseapp.com",
                 projectId: "vulcanobmx",
                 storageBucket: "vulcanobmx.firebasestorage.app",
@@ -765,17 +761,24 @@
                 auth = getAuth(app);
                 db = getFirestore(app);
 
+                // 🔴 CORRECCIÓN DE SINCRONIZACIÓN DE NOTICIAS:
+                // Llamamos a loadNews() INMEDIATAMENTE sin esperar a la autenticación
+                // Esto garantiza que el muro de noticias se llene al instante.
+                loadNews();
+
                 if (isCanvasEnv && typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
                 } else {
-                    await signInAnonymously(auth);
+                    // Intento de auth anónima (si falla, las noticias igual cargarán por reglas abiertas)
+                    try {
+                        await signInAnonymously(auth);
+                    } catch(e) {
+                        console.warn("Auth anónima deshabilitada en Firebase. Utilizando acceso público de lectura/escritura.");
+                    }
                 }
 
                 onAuthStateChanged(auth, (user) => {
                     currentUser = user;
-                    if (user) {
-                        loadNews();
-                    }
                 });
             } catch (err) {
                 console.error("Error Firebase:", err);
@@ -828,6 +831,10 @@
                 });
             }, (error) => {
                 console.error("Error al descargar noticias:", error);
+                const container = document.getElementById('news-container');
+                if(container) {
+                    container.innerHTML = '<div class="col-span-full text-center text-red-500 py-10 italic font-bold">⚠️ Error al conectar con el servidor de noticias. Por favor recarga la página.</div>';
+                }
             });
         };
 
@@ -844,10 +851,8 @@
                 const snap = await getDoc(userDocRef);
                 
                 let data;
-                // Si el ID es COACH, configuramos valores por defecto de Administrador
                 if (uid === 'COACH' || uid === 'ADMIN') {
                     data = { name: "Coach Vulcano", level: "STAFF", points: "∞", age: "--", blood: "--", photoUrl: "", videoUrl: "" };
-                    // Ocultar tarjetas de Mensualidad y Competencia para el Coach
                     document.getElementById('monthlyStatusContainer')?.classList.add('hidden');
                     document.getElementById('nextRaceContainer')?.classList.add('hidden');
                 } else {
@@ -857,7 +862,6 @@
                         paymentStatus: "Al día", nextRace: "Copa Nariño BMX", nextRaceLocation: "Pasto, Nariño",
                         coachNotes: "", reportPhoto: "", reportVideo: ""
                     };
-                    // Asegurar que estén visibles para Pilotos normales
                     document.getElementById('monthlyStatusContainer')?.classList.remove('hidden');
                     document.getElementById('nextRaceContainer')?.classList.remove('hidden');
                 }
@@ -865,7 +869,9 @@
                 if (snap.exists()) {
                     data = { ...data, ...snap.data() };
                 } else {
-                    if (auth && !auth.currentUser) await signInAnonymously(auth);
+                    if (auth && !auth.currentUser) {
+                        try { await signInAnonymously(auth); } catch(e){}
+                    }
                     await setDoc(userDocRef, { ...data, joined: new Date().toISOString() });
                 }
                 
@@ -966,14 +972,14 @@
                         
                         // Parsear número de teléfono a solo dígitos para el enlace de WhatsApp
                         let phoneNum = (d.phone || '').replace(/\D/g, '');
-                        if (phoneNum.length === 10) phoneNum = '57' + phoneNum; // Asume Colombia si tiene 10 dígitos
+                        if (phoneNum.length === 10) phoneNum = '57' + phoneNum;
 
                         item.innerHTML = `
                             <div class="flex justify-between mb-2">
                                 <span class="text-orange-500 font-black text-xs uppercase">${d.name || 'Sin nombre'}</span>
                                 <span class="bg-purple-600/20 text-purple-400 px-2 py-0.5 rounded text-[8px] font-black">${d.level || '-'}</span>
                             </div>
-                            <div class="text-gray-500 text-[10px] mt-2 italic border-t border-white/5 pt-2 mb-3">${d.notes || 'Sin preguntas adicionales.'}</div>
+                            <div class="text-gray-500 text-[10px] mt-2 italic border-t border-white/5 pt-2 mb-3">${d.notes || 'Sin notas.'}</div>
                             <div class="flex gap-3">
                                 <a href="https://wa.me/${phoneNum}" target="_blank" class="bg-green-500/20 text-green-500 hover:bg-green-500 hover:text-white transition px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-2">
                                     <i class="fab fa-whatsapp"></i> WhatsApp
@@ -1021,7 +1027,7 @@
                         await addDoc(leadsRef, {
                             name: document.getElementById('leadName').value,
                             phone: document.getElementById('leadPhone').value,
-                            email: document.getElementById('leadEmail').value, // 🔴 NUEVO CORREO
+                            email: document.getElementById('leadEmail').value,
                             level: document.getElementById('leadLevel').value,
                             notes: document.getElementById('leadNotes').value,
                             timestamp: new Date().toISOString()
@@ -1059,7 +1065,6 @@
                     submitBtn.innerHTML = '<span><div class="loader"></div> VERIFICANDO...</span>';
                     submitBtn.disabled = true;
 
-                    // Si entra el Coach
                     if (loginId === 'COACH' || loginId === 'ADMIN') {
                         window.currentLoginId = loginId;
                         
@@ -1075,13 +1080,11 @@
                         document.getElementById('tab-profile').classList.remove('hidden');
                         document.getElementById('btn-profile').className = 'px-6 py-2 bg-orange-500 rounded-full text-xs font-black uppercase text-white transition shadow-lg';
 
-                        // 🔴 AHORA EL COACH TAMBIÉN USA LA FUNCIÓN DE PERFIL PARA PODER VER SU FOTO
                         checkAdmin();
                         window.switchTab('admin');
                         setupProfile(loginId); 
 
                     } else {
-                        // Validación de Piloto
                         if (db) {
                             try {
                                 const userDocRef = doc(db, 'artifacts', currentAppId, 'public', 'data', 'profiles', loginId);
@@ -1091,7 +1094,6 @@
                                     const data = snap.data();
                                     const storedPass = data.password || ""; 
                                     
-                                    // Verificamos contraseña
                                     if (storedPass !== "" && loginPass !== storedPass) {
                                         alert("Contraseña incorrecta. Intenta de nuevo.");
                                         submitBtn.innerHTML = originalBtnHtml;
@@ -1099,7 +1101,6 @@
                                         return;
                                     }
                                     
-                                    // Acceso Correcto
                                     window.currentLoginId = loginId;
                                     window.toggleModal('loginModal');
                                     document.getElementById('public-site').classList.add('hidden');
@@ -1165,7 +1166,7 @@
                 }
             });
 
-            // Botón para Buscar Piloto Existente en el Gestor
+            // Botón para Buscar Piloto Existente
             const searchPilotBtn = document.getElementById('searchPilotBtn');
             searchPilotBtn?.addEventListener('click', async () => {
                 const pidInput = document.getElementById('pilotIdInput');
@@ -1186,7 +1187,6 @@
                         
                         if (snap.exists()) {
                             const data = snap.data();
-                            // Rellenar todos los campos con los datos guardados
                             document.getElementById('pilotName').value = data.name || '';
                             document.getElementById('pilotPassword').value = data.password || '';
                             document.getElementById('pilotLevel').value = data.level || '';
@@ -1203,7 +1203,6 @@
                             
                             alert("¡Perfil encontrado! Los datos han sido cargados. Puedes modificarlos y luego hacer clic en Guardar Cambios.");
                         } else {
-                            // Limpiamos los campos (menos el ID) para que cree uno nuevo
                             document.getElementById('pilotForm').reset();
                             pidInput.value = pid; 
                             alert("No hay ningún piloto registrado con el ID '" + pid + "'. Puedes llenar los datos y guardarlo como nuevo.");
@@ -1217,7 +1216,7 @@
                 }
             });
 
-            // FORMULARIO GESTOR DE PILOTOS (Guarda o Sobreescribe)
+            // FORMULARIO GESTOR DE PILOTOS
             const pilotForm = document.getElementById('pilotForm');
             pilotForm?.addEventListener('submit', async (e) => {
                 e.preventDefault();
@@ -1232,7 +1231,6 @@
                     try {
                         const profileRef = doc(db, 'artifacts', currentAppId, 'public', 'data', 'profiles', pid);
                         await setDoc(profileRef, {
-                            // Basicos y Acceso
                             name: document.getElementById('pilotName').value.trim(),
                             password: document.getElementById('pilotPassword').value.trim(),
                             level: document.getElementById('pilotLevel').value.trim(),
@@ -1240,19 +1238,16 @@
                             age: document.getElementById('pilotAge').value.trim(),
                             blood: document.getElementById('pilotBlood').value.trim().toUpperCase(),
                             photoUrl: document.getElementById('pilotPhoto').value.trim(),
-                            // Estado / Competencia
                             paymentStatus: document.getElementById('pilotPayment').value,
                             nextRace: document.getElementById('pilotRace').value.trim(),
                             nextRaceLocation: document.getElementById('pilotRaceLoc').value.trim(),
-                            // Reporte del Coach
                             coachNotes: document.getElementById('pilotNotes').value.trim(),
                             reportPhoto: document.getElementById('pilotReportImage').value.trim(),
                             reportVideo: document.getElementById('pilotReportVideo').value.trim(),
-                            
                             updatedAt: new Date().toISOString()
-                        }, { merge: true }); // merge: true evita borrar datos antiguos
+                        }, { merge: true });
                         
-                        alert("¡Éxito! Piloto " + pid + " guardado en la base de datos de Firebase.");
+                        alert("¡Éxito! Piloto " + pid + " guardado en la base de datos.");
                         pilotForm.reset();
                     } catch (err) {
                         console.error(err);
