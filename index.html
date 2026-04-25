@@ -178,7 +178,7 @@
 <body class="overflow-x-hidden">
 
     <!-- WhatsApp Flotante -->
-    <a href="https://wa.me/573174321771" target="_blank" class="whatsapp-float">
+    <a href="https://wa.me/573127814421" target="_blank" class="whatsapp-float">
         <i class="fab fa-whatsapp"></i>
     </a>
 
@@ -669,6 +669,7 @@
                     <div class="bg-zinc-900 p-8 rounded-[3rem] border border-white/5 shadow-2xl">
                         <h3 class="font-heading text-xl font-black text-white uppercase italic mb-8 border-b border-white/5 pb-4 tracking-widest">Publicar Noticia en Inicio</h3>
                         <form id="newsForm" class="space-y-5">
+                            <input type="hidden" id="editNewsId" value="">
                             <input type="text" id="newsTitle" placeholder="Título de la publicación" required class="w-full bg-[#252525] border border-white/5 px-6 py-4 rounded-xl text-white outline-none focus:ring-2 focus:ring-purple-500 transition">
                             <textarea id="newsContent" placeholder="Describe lo que pasó..." rows="3" required class="w-full bg-[#252525] border border-white/5 px-6 py-4 rounded-xl text-white outline-none focus:ring-2 focus:ring-purple-500 transition"></textarea>
                             
@@ -682,9 +683,15 @@
                                 <option value="video">Tipo: Video YouTube (Link)</option>
                                 <option value="text">Tipo: Solo Texto</option>
                             </select>
-                            <button type="submit" id="newsSubmitBtn" class="w-full btn-gradient py-4 rounded-xl font-black uppercase italic shadow-lg text-white flex justify-center items-center">
-                                <span id="newsBtnText">PUBLICAR NOTICIA</span>
-                            </button>
+                            
+                            <div class="flex gap-4 mt-2">
+                                <button type="submit" id="newsSubmitBtn" class="w-full btn-gradient py-4 rounded-xl font-black uppercase italic shadow-lg text-white flex justify-center items-center">
+                                    <span id="newsBtnText">PUBLICAR NOTICIA</span>
+                                </button>
+                                <button type="button" id="cancelEditBtn" class="hidden w-1/3 bg-gray-600 hover:bg-gray-500 transition py-4 rounded-xl font-black uppercase italic shadow-lg text-white justify-center items-center">
+                                    CANCELAR
+                                </button>
+                            </div>
                         </form>
                     </div>
                     
@@ -715,7 +722,7 @@
         // Se añade importación de deleteDoc para borrar noticias
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, doc, setDoc, getDoc, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, doc, setDoc, getDoc, onSnapshot, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const isCanvasEnv = typeof __firebase_config !== 'undefined' && __firebase_config !== null;
 
@@ -730,7 +737,7 @@
         } else {
             // TUS LLAVES REALES
             firebaseConfig = {
-                apiKey: "AIzaSyD2lj5XsTghDKNxa_RE-hK1sA8V174lk_E", // 👈 TU LLAVE REAL AQUÍ
+                apiKey: "PON_TU_API_KEY_REAL_AQUI", // 👈 TU LLAVE REAL AQUÍ
                 authDomain: "vulcanobmx.firebaseapp.com",
                 projectId: "vulcanobmx",
                 storageBucket: "vulcanobmx.firebasestorage.app",
@@ -821,6 +828,30 @@
                     }
                 };
 
+                window.globalNewsData = [];
+
+                // NUEVA FUNCIÓN: Cargar datos de la noticia para editar
+                window.editNews = (newsId) => {
+                    const newsItem = window.globalNewsData.find(n => n.id === newsId);
+                    if (newsItem) {
+                        document.getElementById('editNewsId').value = newsItem.id;
+                        document.getElementById('newsTitle').value = newsItem.title || '';
+                        document.getElementById('newsContent').value = newsItem.content || '';
+                        document.getElementById('newsMediaUrl').value = newsItem.mediaUrl || '';
+                        document.getElementById('newsMediaType').value = newsItem.mediaType || 'image';
+                        
+                        document.getElementById('newsBtnText').innerText = 'ACTUALIZAR NOTICIA';
+                        document.getElementById('cancelEditBtn').classList.remove('hidden');
+                        document.getElementById('cancelEditBtn').classList.add('flex');
+                        
+                        // Cambiar al panel de administración y hacer scroll al formulario
+                        window.switchTab('admin');
+                        setTimeout(() => {
+                            document.getElementById('newsForm').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }, 100);
+                    }
+                };
+
                 loadNews();
 
                 if (isCanvasEnv && typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
@@ -853,14 +884,20 @@
                 
                 if (snap.empty) {
                     container.innerHTML = '<div class="col-span-full text-center text-gray-600 py-10 italic">Aún no hay noticias publicadas. ¡Sé el primero!</div>';
+                    window.globalNewsData = [];
                     return;
                 }
 
-                const docs = [];
-                // Se agregó el id del documento para poder borrarlo
+                let docs = [];
+                // Se agregó el id del documento para poder borrarlo/editarlo
                 snap.forEach(d => docs.push({ id: d.id, ...d.data() }));
                 
-                docs.reverse().forEach(d => {
+                // ORDENAR POR FECHA: Las más nuevas primero (descendente)
+                docs.sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0));
+                
+                window.globalNewsData = docs; // Almacenamos globalmente para poder editar
+                
+                docs.forEach(d => {
                     const card = document.createElement('div');
                     card.className = "bg-zinc-900 p-8 rounded-[2rem] border border-white/5 shadow-2xl text-left flex flex-col h-full";
                     
@@ -880,9 +917,14 @@
                         }
                     }
 
-                    // Botón de eliminar solo si es el COACH
+                    // Botones de eliminar y editar solo si es el COACH
                     const isAdmin = window.currentLoginId === 'COACH' || window.currentLoginId === 'ADMIN';
-                    const adminControls = isAdmin ? `<button onclick="window.deleteNews('${d.id}')" class="text-red-500 hover:text-red-400 text-xs font-bold transition flex items-center gap-1"><i class="fas fa-trash"></i> Eliminar</button>` : '';
+                    const adminControls = isAdmin ? `
+                        <div class="flex gap-4">
+                            <button onclick="window.editNews('${d.id}')" class="text-blue-500 hover:text-blue-400 text-xs font-bold transition flex items-center gap-1"><i class="fas fa-edit"></i> Editar</button>
+                            <button onclick="window.deleteNews('${d.id}')" class="text-red-500 hover:text-red-400 text-xs font-bold transition flex items-center gap-1"><i class="fas fa-trash"></i> Eliminar</button>
+                        </div>
+                    ` : '';
 
                     card.innerHTML = `
                         <div class="flex-grow">
@@ -1203,37 +1245,68 @@
 
             // Formulario Subir Noticias
             const newsForm = document.getElementById('newsForm');
+            const cancelEditBtn = document.getElementById('cancelEditBtn');
+
+            cancelEditBtn?.addEventListener('click', () => {
+                document.getElementById('editNewsId').value = '';
+                newsForm.reset();
+                document.getElementById('newsBtnText').innerHTML = 'PUBLICAR NOTICIA';
+                cancelEditBtn.classList.add('hidden');
+                cancelEditBtn.classList.remove('flex');
+            });
+
             newsForm?.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const btn = document.getElementById('newsSubmitBtn');
                 const btnTextSpan = document.getElementById('newsBtnText');
                 
+                const editId = document.getElementById('editNewsId').value;
                 const title = document.getElementById('newsTitle').value;
                 const content = document.getElementById('newsContent').value;
                 const mediaUrl = document.getElementById('newsMediaUrl').value.trim();
                 const mediaType = document.getElementById('newsMediaType').value;
                 
                 btn.disabled = true;
-                btnTextSpan.innerHTML = '<div class="loader"></div> PUBLICANDO...';
+                const originalText = btnTextSpan.innerHTML;
+                btnTextSpan.innerHTML = '<div class="loader"></div> ' + (editId ? 'ACTUALIZANDO...' : 'PUBLICANDO...');
 
                 try {
                     if (db) {
-                        await addDoc(collection(db, 'artifacts', currentAppId, 'public', 'data', 'news'), {
-                            title: title,
-                            content: content,
-                            mediaUrl: mediaUrl,
-                            mediaType: mediaType,
-                            timestamp: new Date().toISOString()
-                        });
+                        if (editId) {
+                            // Actualizar Noticia (Conserva fecha original)
+                            await updateDoc(doc(db, 'artifacts', currentAppId, 'public', 'data', 'news', editId), {
+                                title: title,
+                                content: content,
+                                mediaUrl: mediaUrl,
+                                mediaType: mediaType
+                            });
+                            alert("¡Noticia actualizada con éxito!");
+                        } else {
+                            // Crear Nueva Noticia
+                            await addDoc(collection(db, 'artifacts', currentAppId, 'public', 'data', 'news'), {
+                                title: title,
+                                content: content,
+                                mediaUrl: mediaUrl,
+                                mediaType: mediaType,
+                                timestamp: new Date().toISOString()
+                            });
+                            alert("¡Noticia publicada con éxito!");
+                        }
                         
-                        e.target.reset();
-                        alert("¡Noticia publicada con éxito! Revisa la página principal.");
+                        document.getElementById('editNewsId').value = '';
+                        newsForm.reset();
+                        btnTextSpan.innerHTML = 'PUBLICAR NOTICIA';
+                        cancelEditBtn?.classList.add('hidden');
+                        cancelEditBtn?.classList.remove('flex');
+                        
+                        // Llevar automáticamente a la portada para ver el resultado
+                        window.goToHome();
                     }
                 } catch(err) {
-                    alert("Error publicando la noticia.");
+                    alert("Error publicando/actualizando la noticia.");
+                    btnTextSpan.innerHTML = originalText;
                 } finally {
                     btn.disabled = false;
-                    btnTextSpan.innerHTML = 'PUBLICAR NOTICIA';
                 }
             });
 
